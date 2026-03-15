@@ -1,6 +1,0 @@
-export { ParticipantSection } from './ParticipantSection'
-export { PromotionPanelSection } from './PromotionPanelSection'
-export { PromotionSetupPanel } from './PromotionSetupPanel'
-export { RosterSection } from './RosterSection'
-export { TournamentMetaSection } from './TournamentMetaSection'
-export { TournamentPromotionEditors } from './TournamentPromotionEditors'

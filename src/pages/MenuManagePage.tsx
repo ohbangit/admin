@@ -4,6 +4,9 @@ import { useAdminToast, useAdminMenus, useCreateMenu, useDeleteMenu, useReorderM
 import type { CreateMenuRequest, MenuRow, ReorderMenuItem, UpdateMenuRequest } from '../types'
 import { getErrorMessage } from '../utils/error'
 import { cn } from '../lib/cn'
+import { panelClass, inputClass, selectClass } from '../constants/styles'
+import { ConfirmModal } from '../components/ConfirmModal'
+import { ListLoading, ListError, ListEmpty } from '../components/ListState'
 
 interface MenuDisplayRow {
     row: MenuRow
@@ -20,9 +23,6 @@ interface MenuFormValues {
     is_external: boolean
 }
 
-const panelClass = 'rounded-2xl border border-[#3a3a44] bg-[#1a1a23]'
-const inputClass =
-    'w-full rounded-xl border border-[#3a3a44] bg-[#26262e] px-3 py-2 text-sm text-[#efeff1] outline-none placeholder:text-[#848494] focus:border-blue-500'
 
 function getDepthPaddingClass(depth: number): string {
     if (depth <= 0) return 'pl-0'
@@ -218,7 +218,7 @@ function MenuFormModal({
                                     parent_id: e.target.value === '' ? null : Number(e.target.value),
                                 }))
                             }
-                            className={cn(inputClass, 'cursor-pointer')}
+                            className={selectClass}
                         >
                             <option value="">최상위 메뉴</option>
                             {parentOptions.map(({ row, depth }) => (
@@ -227,17 +227,6 @@ function MenuFormModal({
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-xs font-medium text-[#adadb8]">아이콘</label>
-                        <input
-                            type="text"
-                            value={values.icon}
-                            onChange={(e) => setValues((prev) => ({ ...prev, icon: e.target.value }))}
-                            className={inputClass}
-                            placeholder="예: LayoutList"
-                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -282,53 +271,6 @@ function MenuFormModal({
                         className="cursor-pointer flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
                     >
                         {pending ? '저장 중...' : submitLabel}
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-interface DeleteMenuModalProps {
-    menu: MenuRow
-    pending: boolean
-    onClose: () => void
-    onConfirm: () => Promise<void>
-}
-
-function DeleteMenuModal({ menu, pending, onClose, onConfirm }: DeleteMenuModalProps) {
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
-                <div className="px-6 py-5">
-                    <h3 className="text-base font-bold text-[#efeff1]">메뉴 삭제</h3>
-                    <p className="mt-2 text-sm text-[#adadb8]">
-                        <span className="font-semibold text-[#efeff1]">{menu.label}</span> 메뉴를 삭제하시겠습니까?
-                    </p>
-                </div>
-                <div className="flex gap-2 border-t border-[#3a3a44] px-6 py-4">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={pending}
-                        className="cursor-pointer flex-1 rounded-xl border border-[#3a3a44] py-2.5 text-sm font-medium text-[#adadb8] transition hover:bg-[#26262e] disabled:opacity-50"
-                    >
-                        취소
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            void onConfirm()
-                        }}
-                        disabled={pending}
-                        className="cursor-pointer flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white transition hover:bg-red-500 disabled:opacity-50"
-                    >
-                        {pending ? '삭제 중...' : '삭제'}
                     </button>
                 </div>
             </div>
@@ -461,17 +403,11 @@ export default function MenuManagePage() {
                     <div>작업</div>
                 </div>
 
-                {isLoading && (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                    </div>
-                )}
+                {isLoading && <ListLoading />}
 
-                {isError && <div className="py-12 text-center text-sm text-red-400">메뉴를 불러오는 중 오류가 발생했습니다.</div>}
+                {isError && <ListError message="메뉴를 불러오는 중 오류가 발생했습니다." />}
 
-                {!isLoading && !isError && displayRows.length === 0 && (
-                    <div className="py-12 text-center text-sm text-[#848494]">등록된 메뉴가 없습니다.</div>
-                )}
+                {!isLoading && !isError && displayRows.length === 0 && <ListEmpty message="등록된 메뉴가 없습니다." />}
 
                 {!isLoading && !isError && displayRows.length > 0 && (
                     <ul className="divide-y divide-[#3a3a44]">
@@ -543,20 +479,16 @@ export default function MenuManagePage() {
                                         <button
                                             type="button"
                                             onClick={() => setEditingMenu(row)}
-                                            className="cursor-pointer rounded-lg border border-[#3a3a44] px-3 py-1.5 text-xs font-medium text-[#adadb8] transition hover:bg-[#26262e]"
+                                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#3a3a44] px-3 py-1.5 text-xs font-medium text-[#adadb8] transition hover:bg-[#26262e]"
                                         >
-                                            <span className="inline-flex items-center gap-1">
-                                                <Pencil className="h-3.5 w-3.5" /> 수정
-                                            </span>
+                                            <Pencil className="h-3.5 w-3.5" /> 수정
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setDeletingMenu(row)}
-                                            className="cursor-pointer rounded-lg border border-red-500/35 px-3 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/10"
+                                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-red-500/35 px-3 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-500/10"
                                         >
-                                            <span className="inline-flex items-center gap-1">
-                                                <Trash2 className="h-3.5 w-3.5" /> 삭제
-                                            </span>
+                                            <Trash2 className="h-3.5 w-3.5" /> 삭제
                                         </button>
                                     </div>
                                 </li>
@@ -592,11 +524,15 @@ export default function MenuManagePage() {
             )}
 
             {deletingMenu !== null && (
-                <DeleteMenuModal
-                    menu={deletingMenu}
+                <ConfirmModal
+                    title="메뉴 삭제"
+                    message="메뉴를 삭제하시겠습니까?"
+                    itemName={deletingMenu.label}
                     pending={deleteMutation.isPending}
                     onClose={() => setDeletingMenu(null)}
-                    onConfirm={handleDelete}
+                    onConfirm={() => {
+                        void handleDelete()
+                    }}
                 />
             )}
         </>

@@ -10,15 +10,10 @@ export interface ListCategoriesResponse {
 
 export interface CreateCategoryRequest {
     name: string
-    thumbnailUrl?: string
-}
-
-export interface UpdateCategoryRequest {
-    name: string
     thumbnailUrl?: string | null
 }
 
-export interface CrawledCategoryItem {
+export interface CrawledCategory {
     categoryId: string
     categoryType: string
     name: string
@@ -27,18 +22,18 @@ export interface CrawledCategoryItem {
     concurrentUserCount: number
 }
 
-export interface CrawlCategoriesRequest {
+export interface RunCategoryCrawlRequest {
     size?: number
 }
 
-export interface CrawlCategoriesResponse {
-    categories: CrawledCategoryItem[]
+export interface RunCategoryCrawlResponse {
+    categories: CrawledCategory[]
 }
 
-export interface InsertCategoriesRequest {
-    categories: CrawledCategoryItem[]
+export interface InsertCrawledCategoriesRequest {
+    categories: CrawledCategory[]
 }
 
-export interface InsertCategoriesResponse {
+export interface InsertCrawledCategoriesResponse {
     insertedCount: number
 }

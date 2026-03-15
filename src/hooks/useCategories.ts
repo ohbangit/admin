@@ -1,38 +1,33 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-    adminApiGet,
-    adminApiPost,
-    adminApiPatch,
-    adminApiDelete,
-} from '../lib/apiClient'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { adminApiDelete, adminApiGet, adminApiPost } from '../lib/apiClient'
 import type {
     CategoryItem,
+    InsertCrawledCategoriesRequest,
+    InsertCrawledCategoriesResponse,
     ListCategoriesResponse,
     CreateCategoryRequest,
-    UpdateCategoryRequest,
-    CrawlCategoriesRequest,
-    CrawlCategoriesResponse,
-    InsertCategoriesRequest,
-    InsertCategoriesResponse,
+    RunCategoryCrawlRequest,
+    RunCategoryCrawlResponse,
 } from '../types'
 
-const CATEGORIES_KEY = ['admin', 'categories'] as const
+const CATEGORIES_QUERY_KEY = ['admin-categories'] as const
 
 export function useCategories() {
     return useQuery({
-        queryKey: CATEGORIES_KEY,
-        queryFn: () =>
-            adminApiGet<ListCategoriesResponse>('/api/admin/categories'),
+        queryKey: CATEGORIES_QUERY_KEY,
+        queryFn: async () => {
+            const res = await adminApiGet<ListCategoriesResponse>('/api/admin/categories')
+            return res.categories
+        },
     })
 }
 
 export function useCreateCategory() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: (body: CreateCategoryRequest) =>
-            adminApiPost<CategoryItem>('/api/admin/categories', body),
+        mutationFn: (body: CreateCategoryRequest) => adminApiPost<{ id: number }>('/api/admin/categories', body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY })
+            void queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY })
         },
     })
 }
@@ -40,55 +35,29 @@ export function useCreateCategory() {
 export function useDeleteCategory() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: (id: number) =>
-            adminApiDelete(`/api/admin/categories/${id}`),
+        mutationFn: (id: number) => adminApiDelete(`/api/admin/categories/${id}`),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY })
+            void queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY })
         },
     })
 }
 
-export function useUpdateCategory() {
+export function useRunCategoryCrawl() {
+    return useMutation({
+        mutationFn: (body: RunCategoryCrawlRequest) =>
+            adminApiPost<RunCategoryCrawlResponse>('/api/admin/category-crawl/run', body),
+    })
+}
+
+export function useInsertCrawledCategories() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: ({
-            id,
-            body,
-        }: {
-            id: number
-            body: UpdateCategoryRequest
-        }) => adminApiPatch<CategoryItem>(`/api/admin/categories/${id}`, body),
+        mutationFn: (body: InsertCrawledCategoriesRequest) =>
+            adminApiPost<InsertCrawledCategoriesResponse>('/api/admin/category-crawl/insert', body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY })
+            void queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY })
         },
     })
 }
 
-export function useCrawlCategories() {
-    return useMutation<CrawlCategoriesResponse, Error, CrawlCategoriesRequest>({
-        mutationFn: (body) =>
-            adminApiPost<CrawlCategoriesResponse>(
-                '/api/admin/category-crawl/run',
-                body,
-            ),
-    })
-}
-
-export function useInsertCategories() {
-    const queryClient = useQueryClient()
-
-    return useMutation<
-        InsertCategoriesResponse,
-        Error,
-        InsertCategoriesRequest
-    >({
-        mutationFn: (body) =>
-            adminApiPost<InsertCategoriesResponse>(
-                '/api/admin/category-crawl/insert',
-                body,
-            ),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY })
-        },
-    })
-}
+export type { CategoryItem }

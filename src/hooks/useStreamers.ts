@@ -1,151 +1,107 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-    adminApiGet,
-    adminApiPost,
-    adminApiPatch,
-    adminApiDelete,
-} from '../lib/apiClient'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { adminApiDelete, adminApiGet, adminApiPatch, adminApiPost, adminApiPut } from '../lib/apiClient'
 import type {
-    StreamerItem,
     RegisterStreamerRequest,
-    UpdateChannelRequest,
-    UpdateYoutubeUrlRequest,
+    RegisterStreamerResponse,
+    StreamerListParams,
+    StreamerListResponse,
     UpdateFanCafeUrlRequest,
     UpdateNicknameRequest,
+    UpdateNicknameResponse,
+    UpdateStreamerAffiliationsRequest,
+    UpdateStreamerAffiliationsResponse,
+    UpdateYoutubeUrlRequest,
 } from '../types'
 
-type StreamerListResponse = {
-    items: StreamerItem[]
-    total: number
-    page?: number
-    size?: number
+const STREAMERS_QUERY_KEY = ['admin-streamers'] as const
+
+function buildQueryParams(params: StreamerListParams): Record<string, string> {
+    const result: Record<string, string> = {}
+    if (params.name) result.name = params.name
+    if (params.hasChannel !== undefined) result.hasChannel = String(params.hasChannel)
+    if (params.page) result.page = String(params.page)
+    if (params.size) result.size = String(params.size)
+    if (params.sort) result.sort = params.sort
+    return result
 }
 
-type StreamersParams = {
-    nickname?: string
-    hasChannel?: boolean
-    page?: number
-    size?: number
-    sort?: 'name_asc' | 'name_desc' | 'follower_desc'
-}
-
-const STREAMERS_KEY = ['admin', 'streamers'] as const
-
-export function useStreamers(params: StreamersParams = {}) {
-    const queryParams: Record<string, string> = {}
-    if (params.nickname !== undefined && params.nickname.trim().length > 0) {
-        queryParams['nickname'] = params.nickname.trim()
-    }
-    if (params.hasChannel === false) {
-        queryParams['hasChannel'] = 'false'
-    }
-    if (params.page !== undefined) {
-        queryParams['page'] = String(params.page)
-    }
-    if (params.size !== undefined) {
-        queryParams['size'] = String(params.size)
-    }
-    if (params.sort !== undefined) {
-        queryParams['sort'] = params.sort
-    }
-    return useQuery<StreamerListResponse>({
-        queryKey: [...STREAMERS_KEY, queryParams],
-        queryFn: () =>
-            adminApiGet<StreamerListResponse>(
-                '/api/admin/streamers',
-                queryParams,
-            ),
+export function useStreamers(params: StreamerListParams) {
+    return useQuery({
+        queryKey: [...STREAMERS_QUERY_KEY, params],
+        queryFn: () => adminApiGet<StreamerListResponse>('/api/admin/streamers', buildQueryParams(params)),
     })
 }
 
 export function useRegisterStreamer() {
     const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, RegisterStreamerRequest>({
-        mutationFn: (body) =>
-            adminApiPost<StreamerItem>('/api/admin/streamers', body),
+    return useMutation({
+        mutationFn: (body: RegisterStreamerRequest) => adminApiPost<RegisterStreamerResponse>('/api/admin/streamers', body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }
 
-export function useSyncStreamer(streamerId: number) {
+export function useRefreshStreamer() {
     const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, UpdateChannelRequest>({
-        mutationFn: (body) =>
-            adminApiPatch<StreamerItem>(
-                `/api/admin/streamers/${streamerId}/channel`,
-                body,
-            ),
+    return useMutation({
+        mutationFn: (id: number) => adminApiPost<RegisterStreamerResponse>(`/api/admin/streamers/${id}/refresh`, {}),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }
 
-export function useUpdateYoutubeUrl(channelId: string) {
+export function useUpdateNickname() {
     const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, UpdateYoutubeUrlRequest>({
-        mutationFn: (body) =>
-            adminApiPatch<StreamerItem>(
-                `/api/admin/streamers/${channelId}/youtube-url`,
-                body,
-            ),
+    return useMutation({
+        mutationFn: ({ id, body }: { id: number; body: UpdateNicknameRequest }) =>
+            adminApiPatch<UpdateNicknameResponse>(`/api/admin/streamers/${id}/nickname`, body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }
 
-export function useUpdateFanCafeUrl(channelId: string) {
+export function useUpdateYoutubeUrl() {
     const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, UpdateFanCafeUrlRequest>({
-        mutationFn: (body) =>
-            adminApiPatch<StreamerItem>(
-                `/api/admin/streamers/${channelId}/fan-cafe-url`,
-                body,
-            ),
+    return useMutation({
+        mutationFn: ({ channelId, body }: { channelId: string; body: UpdateYoutubeUrlRequest }) =>
+            adminApiPatch<void>(`/api/admin/streamers/${channelId}/youtube-url`, body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }
 
-export function useRefreshStreamer(streamerId: number) {
+export function useUpdateFanCafeUrl() {
     const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, void>({
-        mutationFn: () =>
-            adminApiPost<StreamerItem>(
-                `/api/admin/streamers/${streamerId}/refresh`,
-                {},
-            ),
+    return useMutation({
+        mutationFn: ({ channelId, body }: { channelId: string; body: UpdateFanCafeUrlRequest }) =>
+            adminApiPatch<void>(`/api/admin/streamers/${channelId}/fan-cafe-url`, body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
+        },
+    })
+}
+
+export function useUpdateStreamerAffiliations() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ id, body }: { id: number; body: UpdateStreamerAffiliationsRequest }) =>
+            adminApiPut<UpdateStreamerAffiliationsResponse>(`/api/admin/streamers/${id}/affiliations`, body),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }
 
 export function useDeleteStreamer() {
     const queryClient = useQueryClient()
-    return useMutation<void, Error, number>({
-        mutationFn: (streamerId) =>
-            adminApiDelete(`/api/admin/streamers/${streamerId}`),
+    return useMutation({
+        mutationFn: (id: number) => adminApiDelete(`/api/admin/streamers/${id}`),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
-        },
-    })
-}
-
-export function useUpdateNickname(streamerId: number) {
-    const queryClient = useQueryClient()
-    return useMutation<StreamerItem, Error, UpdateNicknameRequest>({
-        mutationFn: (body) =>
-            adminApiPatch<StreamerItem>(
-                `/api/admin/streamers/${streamerId}/nickname`,
-                body,
-            ),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_KEY })
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },
     })
 }

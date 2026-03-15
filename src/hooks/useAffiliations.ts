@@ -1,20 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminApiGet, adminApiPost, adminApiPatch, adminApiDelete, adminApiPut } from '../lib/apiClient'
-import type {
-    AffiliationItem,
-    ListAffiliationsResponse,
-    CreateAffiliationRequest,
-    UpdateAffiliationRequest,
-    UpdateStreamerAffiliationsRequest,
-    UpdateStreamerAffiliationsResponse,
-} from '../types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { adminApiDelete, adminApiGet, adminApiPatch, adminApiPost } from '../lib/apiClient'
+import type { AffiliationItem, CreateAffiliationRequest, ListAffiliationsResponse, UpdateAffiliationRequest } from '../types'
 
-const AFFILIATIONS_KEY = ['admin', 'affiliations'] as const
+const AFFILIATIONS_QUERY_KEY = ['admin-affiliations'] as const
 
 export function useAffiliations() {
     return useQuery({
-        queryKey: AFFILIATIONS_KEY,
-        queryFn: () => adminApiGet<ListAffiliationsResponse>('/api/admin/affiliations'),
+        queryKey: AFFILIATIONS_QUERY_KEY,
+        queryFn: async () => {
+            const res = await adminApiGet<ListAffiliationsResponse>('/api/admin/affiliations')
+            return res.affiliations
+        },
     })
 }
 
@@ -23,7 +19,7 @@ export function useCreateAffiliation() {
     return useMutation({
         mutationFn: (body: CreateAffiliationRequest) => adminApiPost<AffiliationItem>('/api/admin/affiliations', body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_KEY })
+            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_QUERY_KEY })
         },
     })
 }
@@ -34,7 +30,7 @@ export function useUpdateAffiliation() {
         mutationFn: ({ id, body }: { id: number; body: UpdateAffiliationRequest }) =>
             adminApiPatch<AffiliationItem>(`/api/admin/affiliations/${id}`, body),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_KEY })
+            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_QUERY_KEY })
         },
     })
 }
@@ -44,18 +40,7 @@ export function useDeleteAffiliation() {
     return useMutation({
         mutationFn: (id: number) => adminApiDelete(`/api/admin/affiliations/${id}`),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_KEY })
-        },
-    })
-}
-
-export function useUpdateStreamerAffiliations(streamerId: number) {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: (body: UpdateStreamerAffiliationsRequest) =>
-            adminApiPut<UpdateStreamerAffiliationsResponse>(`/api/admin/streamers/${streamerId}/affiliations`, body),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: ['admin', 'streamers'] })
+            void queryClient.invalidateQueries({ queryKey: AFFILIATIONS_QUERY_KEY })
         },
     })
 }
