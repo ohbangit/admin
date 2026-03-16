@@ -24,6 +24,19 @@ export type {
 } from './broadcast'
 
 export type {
+    DiscoveryCandidate,
+    DiscoveryCursor,
+    RunDiscoveryRequest,
+    RunDiscoveryResponse,
+    RegisterCandidatesRequest,
+    RegisterCandidatesResponse,
+    StreamerExclusion,
+    ListExclusionsResponse,
+    CreateExclusionRequest,
+    CreateExclusionsRequest,
+} from './discovery'
+
+export type {
     CategoryItem,
     ListCategoriesResponse,
     CreateCategoryRequest,

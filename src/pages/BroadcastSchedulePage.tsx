@@ -334,10 +334,12 @@ function WeeklyView({
     selectedDate,
     data,
     onEdit,
+    onDelete,
 }: {
     selectedDate: dayjs.Dayjs
     data: WeeklyScheduleResponse
     onEdit: (item: BroadcastItem) => void
+    onDelete: (item: BroadcastItem) => void
 }) {
     const daysByDate = useMemo(() => {
         const map = new Map<string, BroadcastItem[]>()
@@ -366,15 +368,27 @@ function WeeklyView({
 
                                 <div className="space-y-2 p-2.5">
                                     {items.map((item) => (
-                                        <button
+                                        <div
                                             key={item.id}
-                                            type="button"
-                                            onClick={() => onEdit(item)}
-                                            className="w-full cursor-pointer rounded-lg border border-[#3a3a44] bg-[#26262e] px-2.5 py-2 text-left transition hover:border-blue-500/40 hover:bg-[#2c2c37]"
+                                            className="group flex items-start gap-1 rounded-lg border border-[#3a3a44] bg-[#26262e] px-2.5 py-2 transition hover:border-blue-500/40 hover:bg-[#2c2c37]"
                                         >
-                                            <p className="text-[11px] tabular-nums text-blue-300">{dayjs(item.startTime).format('HH:mm')}</p>
-                                            <p className="mt-0.5 truncate text-xs font-medium text-[#efeff1]">{item.title}</p>
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => onEdit(item)}
+                                                className="min-w-0 flex-1 cursor-pointer text-left"
+                                            >
+                                                <p className="text-[11px] tabular-nums text-blue-300">{dayjs(item.startTime).format('HH:mm')}</p>
+                                                <p className="mt-0.5 truncate text-xs font-medium text-[#efeff1]">{item.title}</p>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => onDelete(item)}
+                                                className="shrink-0 cursor-pointer rounded p-0.5 text-[#848494] opacity-0 transition hover:text-red-400 group-hover:opacity-100"
+                                                aria-label={`${item.title} 삭제`}
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
                                     ))}
                                     {items.length === 0 && <p className="pt-2 text-center text-xs text-[#666674]">일정 없음</p>}
                                 </div>
@@ -1141,7 +1155,8 @@ export default function BroadcastSchedulePage() {
             return <DailyView data={filtered} onEdit={setEditingItem} onDelete={setDeletingItem} />
         }
         if (schedule.view === 'weekly') {
-            return <WeeklyView selectedDate={selectedDate} data={schedule} onEdit={setEditingItem} />
+            const filtered = { ...schedule, days: schedule.days.map((day) => ({ ...day, items: filterHidden(day.items) })) }
+            return <WeeklyView selectedDate={selectedDate} data={filtered} onEdit={setEditingItem} onDelete={setDeletingItem} />
         }
         return null
     }

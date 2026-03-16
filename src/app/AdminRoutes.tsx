@@ -8,6 +8,8 @@ const StreamersPage = lazy(() => import('../pages/StreamersPage'))
 const AffiliationManagePage = lazy(() => import('../pages/AffiliationManagePage'))
 const CategoryManagePage = lazy(() => import('../pages/CategoryManagePage'))
 const MenuManagePage = lazy(() => import('../pages/MenuManagePage'))
+const DiscoveryPage = lazy(() => import('../pages/DiscoveryPage'))
+const BroadcastCrawlPage = lazy(() => import('../pages/BroadcastCrawlPage'))
 
 export default function AdminRoutes() {
     return (
@@ -20,6 +22,8 @@ export default function AdminRoutes() {
                         <Route path="affiliations" element={<AffiliationManagePage />} />
                         <Route path="categories" element={<CategoryManagePage />} />
                         <Route path="menus" element={<MenuManagePage />} />
+                        <Route path="discovery" element={<DiscoveryPage />} />
+                        <Route path="broadcast-crawl" element={<BroadcastCrawlPage />} />
                         <Route path="*" element={<Navigate to="schedule" replace />} />
                     </Routes>
                 </Suspense>

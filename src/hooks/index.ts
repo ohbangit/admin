@@ -3,6 +3,14 @@ export { useAdminToast } from './useAdminToast'
 export { useAdminMenus, useCreateMenu, useUpdateMenu, useDeleteMenu, useReorderMenus } from './useMenuManage'
 export { useAffiliations, useCreateAffiliation, useUpdateAffiliation, useDeleteAffiliation } from './useAffiliations'
 export {
+    useRunDiscovery,
+    useRegisterCandidates,
+    useExclusions,
+    useCreateExclusion,
+    useCreateExclusions,
+    useDeleteExclusion,
+} from './useDiscovery'
+export {
     useAdminSchedule,
     useCreateBroadcast,
     useUpdateBroadcast,
