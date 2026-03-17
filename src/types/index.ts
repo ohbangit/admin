@@ -1,3 +1,4 @@
+export type { BannerItem, ListBannersResponse, CreateBannerRequest, UpdateBannerRequest } from './banner'
 export type { MenuRow, CreateMenuRequest, UpdateMenuRequest, ReorderMenuItem, ReorderMenusRequest } from './menu'
 export type { AffiliationItem, ListAffiliationsResponse, CreateAffiliationRequest, UpdateAffiliationRequest } from './affiliation'
 
