@@ -280,7 +280,7 @@ function MenuFormModal({
 
 export default function MenuManagePage() {
     const { addToast } = useAdminToast()
-    const { data: menus = [], isLoading, isError } = useAdminMenus()
+    const { data: menus = [], isLoading, isError, refetch } = useAdminMenus()
     const createMutation = useCreateMenu()
     const updateMutation = useUpdateMenu()
     const deleteMutation = useDeleteMenu()
@@ -405,7 +405,7 @@ export default function MenuManagePage() {
 
                 {isLoading && <ListLoading />}
 
-                {isError && <ListError message="메뉴를 불러오는 중 오류가 발생했습니다." />}
+                {isError && <ListError message="메뉴를 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetch() }} />}
 
                 {!isLoading && !isError && displayRows.length === 0 && <ListEmpty message="등록된 메뉴가 없습니다." />}
 

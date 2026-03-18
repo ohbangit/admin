@@ -3,16 +3,11 @@ export type { MenuRow, CreateMenuRequest, UpdateMenuRequest, ReorderMenuItem, Re
 export type { AffiliationItem, ListAffiliationsResponse, CreateAffiliationRequest, UpdateAffiliationRequest } from './affiliation'
 
 export type {
-    ScheduleView,
     ScheduleParams,
     ScheduleResponse,
     DailyScheduleResponse,
     WeeklyScheduleResponse,
-    MonthlyScheduleResponse,
-    DaySchedule,
     BroadcastItem,
-    BroadcastStreamer,
-    BroadcastCategory,
     CreateBroadcastRequest,
     UpdateBroadcastRequest,
     BroadcastParticipantInput,

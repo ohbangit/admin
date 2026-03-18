@@ -13,17 +13,12 @@ import type { DiscoveryCandidate, DiscoveryCursor, StreamerExclusion } from '../
 import partnerMark from '../assets/mark.png'
 import { cn } from '../lib/cn'
 import { getErrorMessage } from '../utils/error'
+import { getInitial } from '../utils/format'
 import { panelClass, inputClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ListEmpty, ListError, ListLoading } from '../components/ListState'
 
 type TabType = 'discovery' | 'exclusions'
-
-function getInitial(name: string): string {
-    const trimmed = name.trim()
-    if (trimmed.length === 0) return 'U'
-    return trimmed[0]?.toUpperCase() ?? 'U'
-}
 
 function mergeCandidates(existing: DiscoveryCandidate[], incoming: DiscoveryCandidate[]): DiscoveryCandidate[] {
     const map = new Map(existing.map((candidate) => [candidate.channelId, candidate]))
@@ -100,7 +95,7 @@ export default function DiscoveryPage() {
     const registerCandidatesMutation = useRegisterCandidates()
     const createExclusionsMutation = useCreateExclusions()
 
-    const { data: exclusions = [], isLoading: exclusionsLoading, isError: exclusionsError } = useExclusions()
+    const { data: exclusions = [], isLoading: exclusionsLoading, isError: exclusionsError, refetch: refetchExclusions } = useExclusions()
     const deleteExclusionMutation = useDeleteExclusion()
 
     const [activeTab, setActiveTab] = useState<TabType>('discovery')
@@ -400,7 +395,7 @@ export default function DiscoveryPage() {
                     </div>
 
                     {exclusionsLoading && <ListLoading />}
-                    {exclusionsError && <ListError message="제외 목록을 불러오는 중 오류가 발생했습니다." />}
+                    {exclusionsError && <ListError message="제외 목록을 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetchExclusions() }} />}
 
                     {!exclusionsLoading && !exclusionsError && filteredExclusions.length === 0 && <ListEmpty message="표시할 제외 항목이 없습니다." />}
 

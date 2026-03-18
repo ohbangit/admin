@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { ExternalLink, Image, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, ExternalLink, Image, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useAdminToast, useBanners, useCreateBanner, useDeleteBanner, useUpdateBanner } from '../hooks'
 import type { BannerItem, CreateBannerRequest, UpdateBannerRequest } from '../types'
 import { getErrorMessage } from '../utils/error'
@@ -36,7 +36,7 @@ function toDateInputValue(value: string | null): string {
     return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : ''
 }
 
-function toFormValues(item?: BannerItem): BannerFormValues {
+function toFormValues(item?: BannerItem, defaultOrderIndex?: number): BannerFormValues {
     if (item === undefined) {
         return {
             type: '',
@@ -47,7 +47,7 @@ function toFormValues(item?: BannerItem): BannerFormValues {
             tournamentSlug: '',
             startedAt: '',
             endedAt: '',
-            orderIndex: 0,
+            orderIndex: defaultOrderIndex ?? 0,
             isActive: true,
         }
     }
@@ -187,7 +187,7 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
                             value={values.imageUrl}
                             onChange={(event) => setValues((prev) => ({ ...prev, imageUrl: event.target.value }))}
                             className={inputClass}
-                            placeholder="https://... 또는 data:image/..."
+                            placeholder="https://..."
                         />
                         {values.imageUrl.trim().length > 0 && (
                             <div className="overflow-hidden rounded-xl border border-[#3a3a44] bg-[#15151d]">
@@ -240,33 +240,17 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-[#adadb8]">순서</label>
+                    <div className="space-y-1">
+                        <label className="text-xs font-medium text-[#adadb8]">활성</label>
+                        <label className={cn(selectClass, 'flex items-center gap-2 bg-none pr-3')}>
                             <input
-                                type="number"
-                                value={values.orderIndex}
-                                onChange={(event) =>
-                                    setValues((prev) => ({
-                                        ...prev,
-                                        orderIndex: Number.isNaN(event.target.valueAsNumber) ? 0 : event.target.valueAsNumber,
-                                    }))
-                                }
-                                className={inputClass}
+                                type="checkbox"
+                                checked={values.isActive}
+                                onChange={(event) => setValues((prev) => ({ ...prev, isActive: event.target.checked }))}
+                                className="h-4 w-4 cursor-pointer rounded"
                             />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-xs font-medium text-[#adadb8]">활성</label>
-                            <label className={cn(selectClass, 'flex items-center gap-2 bg-none pr-3')}>
-                                <input
-                                    type="checkbox"
-                                    checked={values.isActive}
-                                    onChange={(event) => setValues((prev) => ({ ...prev, isActive: event.target.checked }))}
-                                    className="h-4 w-4 cursor-pointer rounded"
-                                />
-                                <span className="text-sm text-[#efeff1]">배너 노출</span>
-                            </label>
-                        </div>
+                            <span className="text-sm text-[#efeff1]">배너 노출</span>
+                        </label>
                     </div>
 
                     {error !== null && <p className="text-xs text-red-400">{error}</p>}
@@ -299,7 +283,7 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
 
 export default function BannerManagePage() {
     const { addToast } = useAdminToast()
-    const { data: banners = [], isLoading, isError } = useBanners()
+    const { data: banners = [], isLoading, isError, refetch } = useBanners()
     const createMutation = useCreateBanner()
     const updateMutation = useUpdateBanner()
     const deleteMutation = useDeleteBanner()
@@ -309,10 +293,16 @@ export default function BannerManagePage() {
     const [deletingBanner, setDeletingBanner] = useState<BannerItem | null>(null)
     const [activeOverrides, setActiveOverrides] = useState<Record<number, boolean>>({})
     const [pendingToggleIds, setPendingToggleIds] = useState<number[]>([])
+    const [reorderingIds, setReorderingIds] = useState<number[]>([])
 
     const sortedBanners = useMemo(
         () => [...banners].sort((a, b) => (a.orderIndex !== b.orderIndex ? a.orderIndex - b.orderIndex : a.id - b.id)),
         [banners],
+    )
+
+    const nextOrderIndex = useMemo(
+        () => (sortedBanners.length > 0 ? Math.max(...sortedBanners.map((b) => b.orderIndex)) + 1 : 0),
+        [sortedBanners],
     )
 
     useEffect(() => {
@@ -384,6 +374,28 @@ export default function BannerManagePage() {
         }
     }
 
+    async function handleMoveOrder(index: number, direction: 'up' | 'down'): Promise<void> {
+        const targetIndex = direction === 'up' ? index - 1 : index + 1
+        if (targetIndex < 0 || targetIndex >= sortedBanners.length) return
+
+        const current = sortedBanners[index]
+        const target = sortedBanners[targetIndex]
+
+        setReorderingIds((prev) => [...prev, current.id, target.id])
+
+        try {
+            await Promise.all([
+                updateMutation.mutateAsync({ id: current.id, body: { orderIndex: target.orderIndex } }),
+                updateMutation.mutateAsync({ id: target.id, body: { orderIndex: current.orderIndex } }),
+            ])
+        } catch (error) {
+            const message = getErrorMessage(error)
+            if (message !== null) addToast({ message, variant: 'error' })
+        } finally {
+            setReorderingIds((prev) => prev.filter((id) => id !== current.id && id !== target.id))
+        }
+    }
+
     return (
         <>
             <div className="mb-6 flex items-start justify-between gap-3">
@@ -414,12 +426,12 @@ export default function BannerManagePage() {
                 </div>
 
                 {isLoading && <ListLoading />}
-                {isError && <ListError message="배너를 불러오는 중 오류가 발생했습니다." />}
+                {isError && <ListError message="배너를 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetch() }} />}
                 {!isLoading && !isError && sortedBanners.length === 0 && <ListEmpty message="등록된 배너가 없습니다." />}
 
                 {!isLoading && !isError && sortedBanners.length > 0 && (
                     <ul className="divide-y divide-[#3a3a44]">
-                        {sortedBanners.map((item) => {
+                        {sortedBanners.map((item, index) => {
                             const isActive = activeOverrides[item.id] ?? item.isActive
                             const isTogglePending = pendingToggleIds.includes(item.id)
                             const linkText = item.linkUrl ?? item.tournamentSlug
@@ -429,7 +441,30 @@ export default function BannerManagePage() {
                                     key={item.id}
                                     className="grid grid-cols-[70px_90px_minmax(0,2fr)_120px_minmax(0,1.4fr)_130px_88px_120px] items-center gap-3 px-4 py-3"
                                 >
-                                    <div className="text-center text-sm tabular-nums text-[#efeff1]">{item.orderIndex}</div>
+                                    <div className="flex items-center justify-center gap-0.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                void handleMoveOrder(index, 'up')
+                                            }}
+                                            disabled={index === 0 || reorderingIds.includes(item.id)}
+                                            className="inline-flex cursor-pointer items-center justify-center rounded-md p-0.5 text-[#adadb8] transition hover:bg-[#26262e] disabled:cursor-not-allowed disabled:opacity-30"
+                                            aria-label="위로 이동"
+                                        >
+                                            <ChevronUp className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                void handleMoveOrder(index, 'down')
+                                            }}
+                                            disabled={index === sortedBanners.length - 1 || reorderingIds.includes(item.id)}
+                                            className="inline-flex cursor-pointer items-center justify-center rounded-md p-0.5 text-[#adadb8] transition hover:bg-[#26262e] disabled:cursor-not-allowed disabled:opacity-30"
+                                            aria-label="아래로 이동"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                        </button>
+                                    </div>
 
                                     <div className="flex justify-center">
                                         <div className="flex h-9 w-[60px] items-center justify-center overflow-hidden rounded-md border border-[#3a3a44] bg-[#26262e]">
@@ -518,7 +553,7 @@ export default function BannerManagePage() {
                 <BannerFormModal
                     title="배너 생성"
                     submitLabel="저장"
-                    initialValues={toFormValues()}
+                    initialValues={toFormValues(undefined, nextOrderIndex)}
                     pending={createMutation.isPending}
                     onClose={() => setCreating(false)}
                     onSubmit={handleCreate}

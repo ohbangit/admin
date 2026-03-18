@@ -303,7 +303,7 @@ function CrawlModal({ existingNames, runPending, insertPending, onClose, onRun, 
 
 export default function CategoryManagePage() {
     const { addToast } = useAdminToast()
-    const { data: categories = [], isLoading, isError } = useCategories()
+    const { data: categories = [], isLoading, isError, refetch } = useCategories()
     const createMutation = useCreateCategory()
     const deleteMutation = useDeleteCategory()
     const runCrawlMutation = useRunCategoryCrawl()
@@ -422,7 +422,7 @@ export default function CategoryManagePage() {
 
                 {isLoading && <ListLoading />}
 
-                {isError && <ListError message="카테고리를 불러오는 중 오류가 발생했습니다." />}
+                {isError && <ListError message="카테고리를 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetch() }} />}
 
                 {!isLoading && !isError && filteredCategories.length === 0 && <ListEmpty message="표시할 카테고리가 없습니다." />}
 

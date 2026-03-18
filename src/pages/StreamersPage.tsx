@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Pencil, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Pencil, Plus, RefreshCw, Search, Tag, Trash2, X } from 'lucide-react'
 import {
     useAdminToast,
+    useAffiliations,
     useDeleteStreamer,
     useRefreshStreamer,
     useRegisterStreamer,
     useStreamers,
     useUpdateFanCafeUrl,
     useUpdateNickname,
+    useUpdateStreamerAffiliations,
     useUpdateYoutubeUrl,
 } from '../hooks'
-import type { StreamerItem, StreamerSortType } from '../types'
+import type { AffiliationItem, StreamerItem, StreamerSortType } from '../types'
 import { cn } from '../lib/cn'
 import partnerMark from '../assets/mark.png'
 import { getErrorMessage } from '../utils/error'
+import { getInitial } from '../utils/format'
 import { panelClass, inputClass, selectClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
@@ -29,12 +32,6 @@ const sortOptions: { value: StreamerSortType; label: string }[] = [
 function formatFollowerCount(value: number | null): string {
     if (value === null) return '-'
     return value.toLocaleString('ko-KR')
-}
-
-function getInitial(name: string): string {
-    const trimmed = name.trim()
-    if (trimmed.length === 0) return 'U'
-    return trimmed[0]?.toUpperCase() ?? 'U'
 }
 
 function normalizeInput(value: string): string {
@@ -138,38 +135,49 @@ function RegisterModal({ pending, onClose, onSubmit }: RegisterModalProps) {
 
 interface StreamerDetailModalProps {
     streamer: StreamerItem
+    allAffiliations: AffiliationItem[]
     pendingNickname: boolean
     pendingYoutube: boolean
     pendingFanCafe: boolean
+    pendingAffiliations: boolean
     pendingDelete: boolean
     onClose: () => void
     onSaveNickname: (id: number, nickname: string) => Promise<void>
     onSaveYoutubeUrl: (channelId: string, youtubeUrl: string) => Promise<void>
     onSaveFanCafeUrl: (channelId: string, fanCafeUrl: string) => Promise<void>
+    onSaveAffiliations: (id: number, affiliationIds: number[]) => Promise<void>
     onDelete: () => void
 }
 
 function StreamerDetailModal({
     streamer,
+    allAffiliations,
     pendingNickname,
     pendingYoutube,
     pendingFanCafe,
+    pendingAffiliations,
     pendingDelete,
     onClose,
     onSaveNickname,
     onSaveYoutubeUrl,
     onSaveFanCafeUrl,
+    onSaveAffiliations,
     onDelete,
 }: StreamerDetailModalProps) {
     const [nickname, setNickname] = useState(streamer.nickname ?? '')
     const [youtubeUrl, setYoutubeUrl] = useState(streamer.youtubeUrl ?? '')
     const [fanCafeUrl, setFanCafeUrl] = useState(streamer.fanCafeUrl ?? '')
-    const isAnyPending = pendingNickname || pendingYoutube || pendingFanCafe || pendingDelete
+    const [selectedAffIds, setSelectedAffIds] = useState<number[]>(() => streamer.affiliations.map((a) => a.id))
+    const isAnyPending = pendingNickname || pendingYoutube || pendingFanCafe || pendingAffiliations || pendingDelete
+
+    const currentAffIds = new Set(streamer.affiliations.map((a) => a.id))
+    const hasAffiliationChanges = selectedAffIds.length !== currentAffIds.size || selectedAffIds.some((id) => !currentAffIds.has(id))
 
     useEffect(() => {
         setNickname(streamer.nickname ?? '')
         setYoutubeUrl(streamer.youtubeUrl ?? '')
         setFanCafeUrl(streamer.fanCafeUrl ?? '')
+        setSelectedAffIds(streamer.affiliations.map((a) => a.id))
     }, [streamer])
 
     const channelLink = streamer.channelId ? `https://chzzk.naver.com/${streamer.channelId}` : null
@@ -296,6 +304,55 @@ function StreamerDetailModal({
                         </div>
                     </div>
 
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">
+                                <Tag className="h-3.5 w-3.5" /> 소속
+                            </label>
+                            {hasAffiliationChanges && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        void onSaveAffiliations(streamer.id, selectedAffIds)
+                                    }}
+                                    disabled={pendingAffiliations}
+                                    className="cursor-pointer inline-flex items-center gap-1 rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                                >
+                                    <Check className="h-3.5 w-3.5" /> 저장
+                                </button>
+                            )}
+                        </div>
+                        {allAffiliations.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                                {allAffiliations.map((aff) => {
+                                    const selected = selectedAffIds.includes(aff.id)
+                                    return (
+                                        <button
+                                            key={aff.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedAffIds((prev) =>
+                                                    selected ? prev.filter((id) => id !== aff.id) : [...prev, aff.id],
+                                                )
+                                            }}
+                                            disabled={pendingAffiliations}
+                                            className={cn(
+                                                'cursor-pointer rounded-full border px-2.5 py-1 text-xs font-semibold transition disabled:opacity-50',
+                                                selected
+                                                    ? 'border-blue-500/40 bg-blue-500/15 text-blue-300'
+                                                    : 'border-[#3a3a44] bg-[#26262e] text-[#adadb8] hover:bg-[#32323d]',
+                                            )}
+                                        >
+                                            {aff.name}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        ) : (
+                            <p className="text-xs text-[#848494]">등록된 소속이 없습니다.</p>
+                        )}
+                    </div>
+
                     <div className="space-y-2">
                         <p className="text-xs font-medium text-[#adadb8]">외부 링크</p>
                         <div className="flex flex-wrap gap-2">
@@ -373,11 +430,13 @@ function StreamerDetailModal({
 
 export default function StreamersPage() {
     const { addToast } = useAdminToast()
+    const { data: allAffiliations = [] } = useAffiliations()
     const registerMutation = useRegisterStreamer()
     const refreshMutation = useRefreshStreamer()
     const updateNicknameMutation = useUpdateNickname()
     const updateYoutubeMutation = useUpdateYoutubeUrl()
     const updateFanCafeMutation = useUpdateFanCafeUrl()
+    const updateAffiliationsMutation = useUpdateStreamerAffiliations()
     const deleteMutation = useDeleteStreamer()
 
     const [searchInput, setSearchInput] = useState('')
@@ -415,7 +474,7 @@ export default function StreamersPage() {
         [debouncedName, tab, page, sort],
     )
 
-    const { data, isLoading, isError } = useStreamers(params)
+    const { data, isLoading, isError, refetch } = useStreamers(params)
     const items = data?.items ?? []
     const total = data?.total ?? 0
     const currentPage = data?.page ?? page
@@ -481,6 +540,16 @@ export default function StreamersPage() {
         try {
             await updateFanCafeMutation.mutateAsync({ channelId, body: { fanCafeUrl } })
             addToast({ message: '팬카페 URL을 저장했습니다.', variant: 'success' })
+        } catch (error) {
+            const message = getErrorMessage(error)
+            if (message !== null) addToast({ message, variant: 'error' })
+        }
+    }
+
+    async function handleSaveAffiliations(id: number, affiliationIds: number[]): Promise<void> {
+        try {
+            await updateAffiliationsMutation.mutateAsync({ id, body: { affiliationIds } })
+            addToast({ message: '소속을 저장했습니다.', variant: 'success' })
         } catch (error) {
             const message = getErrorMessage(error)
             if (message !== null) addToast({ message, variant: 'error' })
@@ -583,7 +652,7 @@ export default function StreamersPage() {
 
                 {isLoading && <ListLoading />}
 
-                {isError && <ListError message="스트리머 목록을 불러오는 중 오류가 발생했습니다." />}
+                {isError && <ListError message="스트리머 목록을 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetch() }} />}
 
                 {!isLoading && !isError && items.length === 0 && <ListEmpty message="등록된 스트리머가 없습니다." />}
 
@@ -723,14 +792,17 @@ export default function StreamersPage() {
             {detailStreamer !== null && (
                 <StreamerDetailModal
                     streamer={detailStreamer}
+                    allAffiliations={allAffiliations}
                     pendingNickname={updateNicknameMutation.isPending}
                     pendingYoutube={updateYoutubeMutation.isPending}
                     pendingFanCafe={updateFanCafeMutation.isPending}
+                    pendingAffiliations={updateAffiliationsMutation.isPending}
                     pendingDelete={deleteMutation.isPending}
                     onClose={() => setDetailStreamer(null)}
                     onSaveNickname={handleSaveNickname}
                     onSaveYoutubeUrl={handleSaveYoutubeUrl}
                     onSaveFanCafeUrl={handleSaveFanCafeUrl}
+                    onSaveAffiliations={handleSaveAffiliations}
                     onDelete={() => setDeletingStreamer(detailStreamer)}
                 />
             )}

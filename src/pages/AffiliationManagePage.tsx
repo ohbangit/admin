@@ -191,7 +191,7 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
 
 export default function AffiliationManagePage() {
     const { addToast } = useAdminToast()
-    const { data: affiliations = [], isLoading, isError } = useAffiliations()
+    const { data: affiliations = [], isLoading, isError, refetch } = useAffiliations()
     const createMutation = useCreateAffiliation()
     const updateMutation = useUpdateAffiliation()
     const deleteMutation = useDeleteAffiliation()
@@ -263,7 +263,7 @@ export default function AffiliationManagePage() {
 
                 {isLoading && <ListLoading />}
 
-                {isError && <ListError message="소속 목록을 불러오는 중 오류가 발생했습니다." />}
+                {isError && <ListError message="소속 목록을 불러오는 중 오류가 발생했습니다." onRetry={() => { void refetch() }} />}
 
                 {!isLoading && !isError && affiliations.length === 0 && <ListEmpty message="등록된 소속이 없습니다." />}
 
