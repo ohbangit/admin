@@ -7,6 +7,7 @@ import { getErrorMessage } from '../utils/error'
 import { panelClass, inputClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
+import { ModalOverlay } from '../components/ModalOverlay'
 
 interface AffiliationFormValues {
     name: string
@@ -86,13 +87,7 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(event) => {
-                if (event.target === event.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="lg" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">{title}</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">소속명과 색상을 설정할 수 있습니다.</p>
@@ -184,8 +179,7 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
                         {pending ? '저장 중...' : submitLabel}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 

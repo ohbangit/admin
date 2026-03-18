@@ -7,6 +7,7 @@ import { getErrorMessage } from '../utils/error'
 import { cn } from '../lib/cn'
 import { inputClass, panelClass, selectClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
+import { ModalOverlay } from '../components/ModalOverlay'
 import { ListEmpty, ListError, ListLoading } from '../components/ListState'
 
 interface BannerFormValues {
@@ -128,13 +129,7 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(event) => {
-                if (event.target === event.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="xl" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">{title}</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">메인 배너 정보를 생성하거나 수정합니다.</p>
@@ -276,8 +271,7 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
                         {pending ? '저장 중...' : submitLabel}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 

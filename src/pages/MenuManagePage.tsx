@@ -7,6 +7,7 @@ import { cn } from '../lib/cn'
 import { panelClass, inputClass, selectClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
+import { ModalOverlay } from '../components/ModalOverlay'
 
 interface MenuDisplayRow {
     row: MenuRow
@@ -170,13 +171,7 @@ function MenuFormModal({
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="lg" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">{title}</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">GNB 항목을 생성하거나 수정합니다.</p>
@@ -273,8 +268,7 @@ function MenuFormModal({
                         {pending ? '저장 중...' : submitLabel}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 

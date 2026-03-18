@@ -14,6 +14,7 @@ import { getErrorMessage } from '../utils/error'
 import { panelClass, inputClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
+import { ModalOverlay } from '../components/ModalOverlay'
 
 interface CreateCategoryModalProps {
     pending: boolean
@@ -36,13 +37,7 @@ function CreateCategoryModal({ pending, onClose, onSubmit }: CreateCategoryModal
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="lg" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">카테고리 추가</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">직접 카테고리를 등록합니다.</p>
@@ -97,8 +92,7 @@ function CreateCategoryModal({ pending, onClose, onSubmit }: CreateCategoryModal
                         {pending ? '추가 중...' : '추가'}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 
@@ -159,13 +153,7 @@ function CrawlModal({ existingNames, runPending, insertPending, onClose, onRun, 
     const isStepTwo = crawled.length > 0
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget && !runPending && !insertPending) onClose()
-            }}
-        >
-            <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="5xl" disabled={runPending || insertPending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">치지직 카테고리 크롤링</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">
@@ -296,8 +284,7 @@ function CrawlModal({ existingNames, runPending, insertPending, onClose, onRun, 
                         </button>
                     )}
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 

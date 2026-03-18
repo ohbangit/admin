@@ -6,6 +6,7 @@ import type { BroadcastFormModalProps, BroadcastFormValues } from './types'
 import { BROADCAST_TYPE_PRESETS, HOUR_OPTIONS, MINUTE_OPTIONS, getBroadcastTypeBadgeClass, parseTags } from './utils'
 import { cn } from '../../lib/cn'
 import { inputClass, selectClass } from '../../constants/styles'
+import { ModalOverlay } from '../ModalOverlay'
 import partnerMark from '../../assets/mark.png'
 
 export function BroadcastFormModal({ title, submitLabel, initialValues, pending, categories, streamers, onClose, onSubmit }: BroadcastFormModalProps) {
@@ -154,13 +155,7 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(event) => {
-                if (event.target === event.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="2xl" disabled={pending} onClose={onClose}>
                 <div className="flex items-start justify-between border-b border-[#3a3a44] px-6 py-4">
                     <div>
                         <h2 className="text-base font-bold text-[#efeff1]">{title}</h2>
@@ -665,7 +660,6 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
                         {pending ? '저장 중...' : submitLabel}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }

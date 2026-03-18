@@ -19,6 +19,7 @@ import { getErrorMessage } from '../utils/error'
 import { getInitial } from '../utils/format'
 import { panelClass, inputClass, selectClass } from '../constants/styles'
 import { ConfirmModal } from '../components/ConfirmModal'
+import { ModalOverlay } from '../components/ModalOverlay'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
 
 const pageSize = 20
@@ -78,13 +79,7 @@ function RegisterModal({ pending, onClose, onSubmit }: RegisterModalProps) {
     }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(event) => {
-                if (event.target === event.currentTarget && !pending) onClose()
-            }}
-        >
-            <div className="w-full max-w-md overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="md" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">스트리머 등록</h2>
                     <p className="mt-1 text-xs text-[#adadb8]">치지직 채널 ID를 입력해 등록합니다.</p>
@@ -127,8 +122,7 @@ function RegisterModal({ pending, onClose, onSubmit }: RegisterModalProps) {
                         {pending ? '등록 중...' : '등록'}
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 
@@ -183,13 +177,7 @@ function StreamerDetailModal({
     const channelLink = streamer.channelId ? `https://chzzk.naver.com/${streamer.channelId}` : null
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-            onClick={(event) => {
-                if (event.target === event.currentTarget && !isAnyPending) onClose()
-            }}
-        >
-            <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#3a3a44] bg-[#1a1a23] shadow-xl">
+        <ModalOverlay size="2xl" disabled={isAnyPending} onClose={onClose}>
                 <div className="flex items-start justify-between gap-3 border-b border-[#3a3a44] px-6 py-4">
                     <div>
                         <h2 className="text-base font-bold text-[#efeff1]">스트리머 상세 정보</h2>
@@ -423,8 +411,7 @@ function StreamerDetailModal({
                         닫기
                     </button>
                 </div>
-            </div>
-        </div>
+        </ModalOverlay>
     )
 }
 
