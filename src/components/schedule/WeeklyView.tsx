@@ -50,7 +50,7 @@ export function WeeklyView({ selectedDate, data, onEdit, onDelete }: WeeklyViewP
                                                 onClick={() => onEdit(item)}
                                                 className="min-w-0 flex-1 cursor-pointer text-left"
                                             >
-                                                <p className="text-[11px] tabular-nums text-blue-300">{dayjs(item.startTime).format('HH:mm')}</p>
+                                                <p className={cn('text-[11px] tabular-nums', item.startTime !== null ? 'text-blue-300' : 'text-amber-300')}>{item.startTime !== null ? dayjs(item.startTime).format('HH:mm') : '미정'}</p>
                                                 <p className="mt-0.5 truncate text-xs font-medium text-[#efeff1]">{item.title}</p>
                                             </button>
                                             <button

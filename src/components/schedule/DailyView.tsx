@@ -76,7 +76,12 @@ export function DailyView({ data, onEdit, onDelete }: DailyViewProps) {
 
     const sortedItems = data.items
         .slice()
-        .sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf())
+        .sort((a, b) => {
+            if (a.startTime === null && b.startTime === null) return 0
+            if (a.startTime === null) return 1
+            if (b.startTime === null) return -1
+            return dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf()
+        })
 
     return (
         <div className={panelClass}>
@@ -98,7 +103,7 @@ export function DailyView({ data, onEdit, onDelete }: DailyViewProps) {
                             key={item.id}
                             className="grid min-w-[900px] grid-cols-[80px_minmax(160px,2fr)_72px_100px_minmax(140px,1.3fr)_120px_80px] items-center gap-3 px-4 py-3"
                         >
-                            <div className="text-center text-sm tabular-nums text-[#efeff1]">{dayjs(item.startTime).format('HH:mm')}</div>
+                            <div className={cn('text-center text-sm tabular-nums', item.startTime !== null ? 'text-[#efeff1]' : 'text-amber-300')}>{item.startTime !== null ? dayjs(item.startTime).format('HH:mm') : '미정'}</div>
 
                             <div className="min-w-0">
                                 <p className="truncate text-sm font-medium text-[#efeff1]">{item.title}</p>
@@ -153,7 +158,7 @@ export function DailyView({ data, onEdit, onDelete }: DailyViewProps) {
                 {sortedItems.map((item) => (
                     <div key={item.id} className="space-y-2 rounded-xl border border-[#3a3a44] bg-[#26262e] p-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold tabular-nums text-blue-300">{dayjs(item.startTime).format('HH:mm')}</span>
+                            <span className={cn('text-sm font-semibold tabular-nums', item.startTime !== null ? 'text-blue-300' : 'text-amber-300')}>{item.startTime !== null ? dayjs(item.startTime).format('HH:mm') : '미정'}</span>
                             <span
                                 className={cn(
                                     'rounded-full border px-2 py-0.5 text-[11px] font-semibold',

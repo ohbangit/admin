@@ -10,6 +10,7 @@ export interface BroadcastFormValues {
     title: string
     startDate: string
     startTime: string
+    isUndecidedTime: boolean
     broadcastType: string
     categoryId: string
     tagsInput: string

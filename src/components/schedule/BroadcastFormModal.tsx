@@ -141,13 +141,15 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
             setError('제목은 필수입니다.')
             return
         }
-        if (values.startDate.trim().length === 0 || values.startTime.trim().length === 0) {
-            setError('시작 날짜와 시간을 확인해 주세요.')
-            return
-        }
-        if (!dayjs(`${values.startDate}T${values.startTime}`).isValid()) {
-            setError('시작 시간을 확인해 주세요.')
-            return
+        if (!values.isUndecidedTime) {
+            if (values.startDate.trim().length === 0 || values.startTime.trim().length === 0) {
+                setError('시작 날짜와 시간을 확인해 주세요.')
+                return
+            }
+            if (!dayjs(`${values.startDate}T${values.startTime}`).isValid()) {
+                setError('시작 시간을 확인해 주세요.')
+                return
+            }
         }
 
         setError(null)
@@ -264,46 +266,66 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
                     </div>
 
                     <div className="space-y-1">
-                        <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">
-                            <Clock className="h-3.5 w-3.5" /> 시간 <span className="text-red-400">*</span>
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="date"
-                                value={values.startDate}
-                                onChange={(event) => setValues((prev) => ({ ...prev, startDate: event.target.value }))}
-                                className={cn(inputClass, 'w-auto flex-1')}
-                            />
-                            <select
-                                value={selectedHour}
-                                onChange={(event) => {
-                                    const hour = event.target.value
-                                    setValues((prev) => ({ ...prev, startTime: `${hour}:${selectedMinute}` }))
-                                }}
-                                className={cn(selectClass, 'w-auto')}
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">
+                                <Clock className="h-3.5 w-3.5" /> 시간
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setValues((prev) => ({ ...prev, isUndecidedTime: !prev.isUndecidedTime }))}
+                                className={cn(
+                                    'cursor-pointer rounded-full border px-2.5 py-1 text-[11px] font-semibold transition',
+                                    values.isUndecidedTime
+                                        ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
+                                        : 'border-[#3a3a44] bg-[#26262e] text-[#adadb8] hover:bg-[#32323d]',
+                                )}
                             >
-                                {HOUR_OPTIONS.map((hour) => (
-                                    <option key={hour} value={hour}>
-                                        {hour}시
-                                    </option>
-                                ))}
-                            </select>
-                            <span className="text-sm font-bold text-[#848494]">:</span>
-                            <select
-                                value={selectedMinute}
-                                onChange={(event) => {
-                                    const minute = event.target.value
-                                    setValues((prev) => ({ ...prev, startTime: `${selectedHour}:${minute}` }))
-                                }}
-                                className={cn(selectClass, 'w-auto')}
-                            >
-                                {MINUTE_OPTIONS.map((minute) => (
-                                    <option key={minute} value={minute}>
-                                        {minute}분
-                                    </option>
-                                ))}
-                            </select>
+                                미정
+                            </button>
                         </div>
+                        {values.isUndecidedTime ? (
+                            <div className="flex items-center justify-center rounded-xl border border-dashed border-amber-500/30 bg-amber-500/5 py-3 text-xs text-amber-300">
+                                시작 시간 미정
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="date"
+                                    value={values.startDate}
+                                    onChange={(event) => setValues((prev) => ({ ...prev, startDate: event.target.value }))}
+                                    className={cn(inputClass, 'w-auto flex-1')}
+                                />
+                                <select
+                                    value={selectedHour}
+                                    onChange={(event) => {
+                                        const hour = event.target.value
+                                        setValues((prev) => ({ ...prev, startTime: `${hour}:${selectedMinute}` }))
+                                    }}
+                                    className={cn(selectClass, 'w-auto')}
+                                >
+                                    {HOUR_OPTIONS.map((hour) => (
+                                        <option key={hour} value={hour}>
+                                            {hour}시
+                                        </option>
+                                    ))}
+                                </select>
+                                <span className="text-sm font-bold text-[#848494]">:</span>
+                                <select
+                                    value={selectedMinute}
+                                    onChange={(event) => {
+                                        const minute = event.target.value
+                                        setValues((prev) => ({ ...prev, startTime: `${selectedHour}:${minute}` }))
+                                    }}
+                                    className={cn(selectClass, 'w-auto')}
+                                >
+                                    {MINUTE_OPTIONS.map((minute) => (
+                                        <option key={minute} value={minute}>
+                                            {minute}분
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">

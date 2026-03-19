@@ -30,7 +30,7 @@ export interface BroadcastItem {
     id: number
     title: string
     broadcastType: string | null
-    startTime: string
+    startTime: string | null
     thumbnailUrl: string | null
     isDrops: boolean
     isVisible: boolean
@@ -78,7 +78,7 @@ export type ScheduleResponse = DailyScheduleResponse | WeeklyScheduleResponse | 
 /** 방송 생성 요청 */
 export interface CreateBroadcastRequest {
     title: string
-    startTime: string
+    startTime: string | null
     broadcastType?: string
     categoryId?: number
     thumbnailUrl?: string
@@ -96,7 +96,7 @@ export interface CreateBroadcastRequest {
 /** 방송 수정 요청 */
 export interface UpdateBroadcastRequest {
     title?: string
-    startTime?: string
+    startTime?: string | null
     broadcastType?: string
     categoryId?: number
     thumbnailUrl?: string

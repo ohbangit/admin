@@ -56,7 +56,7 @@ export function getDateRangeText(view: 'daily' | 'weekly', selectedDate: dayjs.D
 }
 
 export function toCreatePayload(values: BroadcastFormValues): CreateBroadcastRequest {
-    const parsed = dayjs(`${values.startDate}T${values.startTime}`)
+    const parsed = values.isUndecidedTime ? null : dayjs(`${values.startDate}T${values.startTime}`)
     const participants: BroadcastParticipantInput[] = values.participants.map((item) => ({
         name: item.name,
         streamerId: item.streamerId,
@@ -65,7 +65,7 @@ export function toCreatePayload(values: BroadcastFormValues): CreateBroadcastReq
 
     return {
         title: values.title.trim(),
-        startTime: parsed.isValid() ? parsed.toISOString() : dayjs().toISOString(),
+        startTime: parsed !== null && parsed.isValid() ? parsed.toISOString() : null,
         broadcastType: values.broadcastType.trim() || undefined,
         categoryId: values.categoryId.length > 0 ? Number(values.categoryId) : undefined,
         tags: parseTags(values.tagsInput),
@@ -77,7 +77,7 @@ export function toCreatePayload(values: BroadcastFormValues): CreateBroadcastReq
 }
 
 export function toUpdatePayload(values: BroadcastFormValues): UpdateBroadcastRequest {
-    const parsed = dayjs(`${values.startDate}T${values.startTime}`)
+    const parsed = values.isUndecidedTime ? null : dayjs(`${values.startDate}T${values.startTime}`)
     const participants: BroadcastParticipantInput[] = values.participants.map((item) => ({
         name: item.name,
         streamerId: item.streamerId,
@@ -86,7 +86,7 @@ export function toUpdatePayload(values: BroadcastFormValues): UpdateBroadcastReq
 
     return {
         title: values.title.trim(),
-        startTime: parsed.isValid() ? parsed.toISOString() : undefined,
+        startTime: parsed !== null && parsed.isValid() ? parsed.toISOString() : null,
         broadcastType: values.broadcastType.trim() || undefined,
         categoryId: values.categoryId.length > 0 ? Number(values.categoryId) : undefined,
         tags: parseTags(values.tagsInput),
@@ -104,6 +104,7 @@ export function toFormValues(item: BroadcastItem | null, selectedDate: dayjs.Day
             title: '',
             startDate: initialStart.date,
             startTime: initialStart.time,
+            isUndecidedTime: false,
             broadcastType: '',
             categoryId: '',
             tagsInput: '',
@@ -114,13 +115,15 @@ export function toFormValues(item: BroadcastItem | null, selectedDate: dayjs.Day
         }
     }
 
-    const parsed = dayjs(item.startTime)
+    const isUndecided = item.startTime === null
+    const parsed = isUndecided ? null : dayjs(item.startTime)
     const initialStart = getInitialStartTime(selectedDate)
 
     return {
         title: item.title,
-        startDate: parsed.isValid() ? parsed.format('YYYY-MM-DD') : initialStart.date,
-        startTime: parsed.isValid() ? parsed.format('HH:mm') : initialStart.time,
+        startDate: parsed !== null && parsed.isValid() ? parsed.format('YYYY-MM-DD') : initialStart.date,
+        startTime: parsed !== null && parsed.isValid() ? parsed.format('HH:mm') : initialStart.time,
+        isUndecidedTime: isUndecided,
         broadcastType: item.broadcastType ?? '',
         categoryId: item.category?.id !== undefined ? String(item.category.id) : '',
         tagsInput: item.tags.join(', '),
