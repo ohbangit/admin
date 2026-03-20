@@ -203,13 +203,13 @@ function BannerFormModal({ title, submitLabel, initialValues, pending, onClose, 
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs font-medium text-[#adadb8]">토너먼트 슬러그</label>
+                            <label className="text-xs font-medium text-[#adadb8]">링크 슬러그</label>
                             <input
                                 type="text"
                                 value={values.tournamentSlug}
                                 onChange={(event) => setValues((prev) => ({ ...prev, tournamentSlug: event.target.value }))}
                                 className={inputClass}
-                                placeholder="예: spring-cup-2026"
+                                placeholder="예: overwatch-vs-talon"
                             />
                         </div>
                     </div>
