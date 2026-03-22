@@ -4,6 +4,13 @@ export { useAdminToast } from './useAdminToast'
 export { useAdminMenus, useCreateMenu, useUpdateMenu, useDeleteMenu, useReorderMenus } from './useMenuManage'
 export { useAffiliations, useCreateAffiliation, useUpdateAffiliation, useDeleteAffiliation } from './useAffiliations'
 export {
+    useScheduleSources,
+    useCreateScheduleSource,
+    useUpdateScheduleSource,
+    useDeleteScheduleSource,
+    useToggleScheduleSourceActive,
+} from './useScheduleSources'
+export {
     useRunDiscovery,
     useRegisterCandidates,
     useExclusions,

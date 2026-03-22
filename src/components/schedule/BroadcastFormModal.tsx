@@ -347,9 +347,22 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
                                                 setIsCategoryOpen(false)
                                             }
                                         }}
-                                        className={cn(inputClass, 'pl-9')}
+                                        className={cn(inputClass, 'pl-9 pr-8')}
                                         placeholder="카테고리 검색"
                                     />
+                                    {categorySearch.length > 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setCategorySearch('')
+                                                setIsCategoryOpen(false)
+                                            }}
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-[#7e7e8c] transition hover:bg-[#3a3a44] hover:text-[#efeff1]"
+                                            aria-label="검색어 초기화"
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    )}
 
                                     {isCategoryOpen && (
                                         <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl border border-[#3a3a44] bg-[#1f1f28] shadow-xl">
@@ -409,13 +422,25 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
 
                         <div className="space-y-1">
                             <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]"><Tag className="h-3.5 w-3.5" /> 태그</label>
-                            <input
-                                type="text"
-                                value={values.tagsInput}
-                                onChange={(event) => setValues((prev) => ({ ...prev, tagsInput: event.target.value }))}
-                                className={inputClass}
-                                placeholder="예: 인챈트, 허니즈"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={values.tagsInput}
+                                    onChange={(event) => setValues((prev) => ({ ...prev, tagsInput: event.target.value }))}
+                                    className={cn(inputClass, values.tagsInput.length > 0 ? 'pr-8' : '')}
+                                    placeholder="예: 인챈트, 허니즈"
+                                />
+                                {values.tagsInput.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setValues((prev) => ({ ...prev, tagsInput: '' }))}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-[#7e7e8c] transition hover:bg-[#3a3a44] hover:text-[#efeff1]"
+                                        aria-label="태그 초기화"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex flex-wrap gap-1.5">
                                 {affiliationTagPresets.map((preset) => {
                                     const currentTags = parseTags(values.tagsInput)

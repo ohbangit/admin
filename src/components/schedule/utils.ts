@@ -4,11 +4,12 @@ import type { BroadcastFormValues } from './types'
 
 export const KOREAN_DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
 export const WEEKDAY_MON_TO_SUN = ['월', '화', '수', '목', '금', '토', '일']
-export const BROADCAST_TYPE_PRESETS = ['합방', '콘텐츠', '내전'] as const
+export const BROADCAST_TYPE_PRESETS = ['방송', '합방', '콘텐츠', '내전'] as const
 export const HOUR_OPTIONS = Array.from({ length: 24 }, (_, index) => String(index).padStart(2, '0'))
 export const MINUTE_OPTIONS = ['00', '30'] as const
 
 export function getBroadcastTypeBadgeClass(type: string | null): string {
+    if (type === '방송') return 'border-green-500/40 bg-green-500/15 text-green-300'
     if (type === '합방') return 'border-purple-500/40 bg-purple-500/15 text-purple-300'
     if (type === '콘텐츠') return 'border-blue-500/40 bg-blue-500/15 text-blue-300'
     if (type === '내전') return 'border-orange-500/40 bg-orange-500/15 text-orange-300'
