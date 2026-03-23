@@ -23,6 +23,9 @@ export type {
     CrawledParticipant,
     InsertCrawledBroadcastsRequest,
     InsertCrawledBroadcastsResponse,
+    ExtractionMeta,
+    ReviewBroadcastItem,
+    ReviewQueueResponse,
 } from './broadcast'
 
 export type {
