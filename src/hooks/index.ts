@@ -40,3 +40,4 @@ export {
     useUpdateStreamerAffiliations,
     useDeleteStreamer,
 } from './useStreamers'
+export { useNotices, useCreateNotice, useUpdateNotice, useDeleteNotice } from './useNotices'

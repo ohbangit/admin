@@ -67,3 +67,5 @@ export type {
     UpdateStreamerAffiliationsRequest,
     UpdateStreamerAffiliationsResponse,
 } from './streamer'
+
+export type { NoticeItem, ListNoticesResponse, CreateNoticeRequest, UpdateNoticeRequest } from './notice'

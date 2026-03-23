@@ -10,6 +10,7 @@ const CategoryManagePage = lazy(() => import('../pages/CategoryManagePage'))
 const MenuManagePage = lazy(() => import('../pages/MenuManagePage'))
 const DiscoveryPage = lazy(() => import('../pages/DiscoveryPage'))
 const BannerManagePage = lazy(() => import('../pages/BannerManagePage'))
+const NoticeManagePage = lazy(() => import('../pages/NoticeManagePage'))
 const BroadcastCrawlPage = lazy(() => import('../pages/BroadcastCrawlPage'))
 const CrawlGroupManagePage = lazy(() => import('../pages/CrawlGroupManagePage'))
 
@@ -24,6 +25,7 @@ export default function AdminRoutes() {
                         <Route path="affiliations" element={<AffiliationManagePage />} />
                         <Route path="categories" element={<CategoryManagePage />} />
                         <Route path="banners" element={<BannerManagePage />} />
+                        <Route path="notices" element={<NoticeManagePage />} />
                         <Route path="menus" element={<MenuManagePage />} />
                         <Route path="discovery" element={<DiscoveryPage />} />
                         <Route path="broadcast-crawl" element={<BroadcastCrawlPage />} />
