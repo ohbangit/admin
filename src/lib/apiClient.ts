@@ -65,11 +65,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
         })
     }
     if (response.status === 204) {
-        return undefined as T
+        return null as T
     }
     const rawBody = await response.text()
     if (rawBody.trim().length === 0) {
-        return undefined as T
+        return null as T
     }
     return JSON.parse(rawBody) as T
 }

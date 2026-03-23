@@ -1,3 +1,5 @@
+import { cn } from '../lib/cn'
+
 interface ListLoadingProps {
     className?: string
     rows?: number
@@ -30,7 +32,7 @@ interface ListErrorProps {
 
 export function ListError({ message = '데이터를 불러오는 중 오류가 발생했습니다.', className = 'py-12', onRetry }: ListErrorProps) {
     return (
-        <div className={`flex flex-col items-center gap-3 ${className}`}>
+        <div className={cn('flex flex-col items-center gap-3', className)}>
             <p className="text-sm text-red-400">{message}</p>
             {onRetry !== undefined && (
                 <button
@@ -51,5 +53,5 @@ interface ListEmptyProps {
 }
 
 export function ListEmpty({ message = '등록된 항목이 없습니다.', className = 'py-12' }: ListEmptyProps) {
-    return <div className={`text-center text-sm text-[#848494] ${className}`}>{message}</div>
+    return <div className={cn('text-center text-sm text-[#848494]', className)}>{message}</div>
 }

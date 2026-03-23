@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { CalendarDays, FolderOpen, Image, LayoutList, LogOut, PanelLeftClose, PanelLeftOpen, Radio, Search, Tag, Users } from 'lucide-react'
+import { CalendarDays, FolderOpen, Image, Layers, LayoutList, LogOut, PanelLeftClose, PanelLeftOpen, Radio, Search, Tag, Users } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -39,6 +39,7 @@ const NAV_SECTIONS: NavSection[] = [
         items: [
             { to: '/discovery', label: '스트리머 크롤링', icon: Search },
             { to: '/broadcast-crawl', label: '방송 크롤링', icon: Radio },
+            { to: '/crawl-groups', label: '크롤링 스케줄', icon: Layers },
         ],
     },
 ]

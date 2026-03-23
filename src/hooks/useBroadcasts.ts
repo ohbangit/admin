@@ -4,6 +4,7 @@ import type {
     CreateBroadcastRequest,
     InsertCrawledBroadcastsRequest,
     InsertCrawledBroadcastsResponse,
+    ReviewQueueResponse,
     RunBroadcastCrawlRequest,
     RunBroadcastCrawlResponse,
     ScheduleParams,
@@ -12,6 +13,7 @@ import type {
 } from '../types'
 
 const SCHEDULE_QUERY_KEY = ['admin-schedule'] as const
+const REVIEW_QUEUE_KEY = ['admin-review-queue'] as const
 
 function buildScheduleParams(params: ScheduleParams): Record<string, string> {
     const result: Record<string, string> = { view: params.view, date: params.date }
@@ -52,6 +54,37 @@ export function useDeleteBroadcast() {
     return useMutation({
         mutationFn: (id: number) => adminApiDelete(`/api/admin/broadcasts/${id}`),
         onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEY })
+        },
+    })
+}
+
+export function useReviewQueue() {
+    return useQuery({
+        queryKey: [...REVIEW_QUEUE_KEY],
+        queryFn: () => adminApiGet<ReviewQueueResponse>('/api/admin/broadcasts/review'),
+    })
+}
+
+export function useApproveReview() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (id: number) =>
+            adminApiPatch<{ id: string }>(`/api/admin/broadcasts/${id}/approve`, {}),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: REVIEW_QUEUE_KEY })
+            void queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEY })
+        },
+    })
+}
+
+export function useBulkApprove() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (ids: string[]) =>
+            adminApiPost<{ approvedCount: number }>('/api/admin/broadcasts/bulk-approve', { ids }),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: REVIEW_QUEUE_KEY })
             void queryClient.invalidateQueries({ queryKey: SCHEDULE_QUERY_KEY })
         },
     })

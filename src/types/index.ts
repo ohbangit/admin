@@ -1,6 +1,12 @@
 export type { BannerItem, ListBannersResponse, CreateBannerRequest, UpdateBannerRequest } from './banner'
 export type { MenuRow, CreateMenuRequest, UpdateMenuRequest, ReorderMenuItem, ReorderMenusRequest } from './menu'
 export type { AffiliationItem, ListAffiliationsResponse, CreateAffiliationRequest, UpdateAffiliationRequest } from './affiliation'
+export type {
+    ScheduleSourceItem,
+    ListScheduleSourcesResponse,
+    CreateScheduleSourceRequest,
+    UpdateScheduleSourceRequest,
+} from './scheduleSource'
 
 export type {
     ScheduleParams,
@@ -17,6 +23,9 @@ export type {
     CrawledParticipant,
     InsertCrawledBroadcastsRequest,
     InsertCrawledBroadcastsResponse,
+    ExtractionMeta,
+    ReviewBroadcastItem,
+    ReviewQueueResponse,
 } from './broadcast'
 
 export type {

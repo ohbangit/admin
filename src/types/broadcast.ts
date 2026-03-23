@@ -118,6 +118,28 @@ export interface BroadcastParticipantInput {
     isHost?: boolean
 }
 
+/** 추출 메타데이터 (broadcast_extractions) */
+export interface ExtractionMeta {
+    confidence: number
+    needsReview: boolean
+    sourceImageUrl: string | null
+    rawContent: string | null
+    extractionModel: string | null
+    extractedAt: string
+}
+
+/** 검수 대기 방송 아이템 */
+export interface ReviewBroadcastItem extends BroadcastItem {
+    sourceUrl: string | null
+    extraction: ExtractionMeta | null
+}
+
+/** 검수 대기 목록 응답 */
+export interface ReviewQueueResponse {
+    items: ReviewBroadcastItem[]
+    totalCount: number
+}
+
 /** 크롤링 실행 요청 */
 export interface RunBroadcastCrawlRequest {
     month: string
