@@ -36,6 +36,8 @@ export interface BroadcastItem {
     isVisible: boolean
     isChzzkSupport: boolean
     source: string | null
+    sourceUrl: string | null
+    sourceImageUrl: string | null
     category: BroadcastCategory | null
     tags: string[]
     streamers: BroadcastStreamer[]
@@ -130,7 +132,6 @@ export interface ExtractionMeta {
 
 /** 검수 대기 방송 아이템 */
 export interface ReviewBroadcastItem extends BroadcastItem {
-    sourceUrl: string | null
     extraction: ExtractionMeta | null
 }
 

@@ -254,10 +254,13 @@ export default function BroadcastSchedulePage() {
                     categories={categoryOptions}
                     streamers={streamers}
                     sourceInfo={
-                        'sourceUrl' in editingItem
+                        editingItem.sourceUrl || editingItem.sourceImageUrl
                             ? {
                                   sourceUrl: editingItem.sourceUrl,
-                                  sourceImageUrl: editingItem.extraction?.sourceImageUrl ?? null,
+                                  sourceImageUrl:
+                                      'extraction' in editingItem
+                                          ? (editingItem.extraction?.sourceImageUrl ?? editingItem.sourceImageUrl)
+                                          : editingItem.sourceImageUrl,
                               }
                             : undefined
                     }
