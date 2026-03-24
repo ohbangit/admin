@@ -102,9 +102,9 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
                         <span className="text-xs font-medium text-[#848494]">출처</span>
                         {sourceInfo.sourceImageUrl && (
                             <a href={sourceInfo.sourceImageUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-[#3a3a44] px-2 py-1 text-xs text-[#adadb8] transition hover:border-blue-500/40 hover:text-blue-300">
-                                <ImageIcon className="h-3 w-3" />
-                                원본 이미지
-                                <ExternalLink className="h-2.5 w-2.5 opacity-50" />
+                                <ImageIcon className="h-3 w-3 shrink-0" />
+                                <span className="max-w-[200px] truncate">{sourceInfo.sourceImageUrl}</span>
+                                <ExternalLink className="h-2.5 w-2.5 shrink-0 opacity-50" />
                             </a>
                         )}
                         {sourceInfo.sourceUrl && (
