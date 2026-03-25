@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { CalendarDays, FolderOpen, Image, Layers, LayoutList, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Radio, Search, Tag, Users } from 'lucide-react'
+import { CalendarDays, ExternalLink, FolderOpen, Image, Layers, LayoutList, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Radio, Search, Tag, Users } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
@@ -79,13 +79,24 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             )}
           >
             {!sidebarCollapsed && <span className="text-sm font-bold text-gray-900 dark:text-[#efeff1]">어드민</span>}
-            <button
-              onClick={handleToggleSidebar}
-              title={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
-              className="cursor-pointer rounded-md p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-[#adadb8] dark:hover:bg-[#2e2e38] dark:hover:text-[#efeff1]"
-            >
-              {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-            </button>
+            <div className="flex items-center gap-1">
+              <a
+                href="https://ohbang-it.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="사이트 바로가기"
+                className="cursor-pointer rounded-md p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-[#adadb8] dark:hover:bg-[#2e2e38] dark:hover:text-[#efeff1]"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+              <button
+                onClick={handleToggleSidebar}
+                title={sidebarCollapsed ? '사이드바 열기' : '사이드바 닫기'}
+                className="cursor-pointer rounded-md p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-[#adadb8] dark:hover:bg-[#2e2e38] dark:hover:text-[#efeff1]"
+              >
+                {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <nav className="flex flex-1 flex-col px-3 py-3">
