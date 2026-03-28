@@ -30,14 +30,5 @@ export {
     useInsertCrawledBroadcasts,
 } from './useBroadcasts'
 export { useCategories, useCreateCategory, useDeleteCategory, useRunCategoryCrawl, useInsertCrawledCategories } from './useCategories'
-export {
-    useStreamers,
-    useRegisterStreamer,
-    useRefreshStreamer,
-    useUpdateNickname,
-    useUpdateYoutubeUrl,
-    useUpdateFanCafeUrl,
-    useUpdateStreamerAffiliations,
-    useDeleteStreamer,
-} from './useStreamers'
+export { useStreamers, useRegisterStreamer, useRefreshStreamer, useDeleteStreamer, useUpdateStreamer } from './useStreamers'
 export { useNotices, useCreateNotice, useUpdateNotice, useDeleteNotice } from './useNotices'

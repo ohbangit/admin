@@ -1,16 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { adminApiDelete, adminApiGet, adminApiPatch, adminApiPost, adminApiPut } from '../lib/apiClient'
+import { adminApiDelete, adminApiGet, adminApiPatch, adminApiPost } from '../lib/apiClient'
 import type {
     RegisterStreamerRequest,
     RegisterStreamerResponse,
     StreamerListParams,
     StreamerListResponse,
-    UpdateFanCafeUrlRequest,
-    UpdateNicknameRequest,
-    UpdateNicknameResponse,
-    UpdateStreamerAffiliationsRequest,
-    UpdateStreamerAffiliationsResponse,
-    UpdateYoutubeUrlRequest,
+    UpdateStreamerRequest,
 } from '../types'
 
 const STREAMERS_QUERY_KEY = ['admin-streamers'] as const
@@ -52,54 +47,21 @@ export function useRefreshStreamer() {
     })
 }
 
-export function useUpdateNickname() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: ({ id, body }: { id: number; body: UpdateNicknameRequest }) =>
-            adminApiPatch<UpdateNicknameResponse>(`/api/admin/streamers/${id}/nickname`, body),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
-        },
-    })
-}
-
-export function useUpdateYoutubeUrl() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: ({ channelId, body }: { channelId: string; body: UpdateYoutubeUrlRequest }) =>
-            adminApiPatch<void>(`/api/admin/streamers/${channelId}/youtube-url`, body),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
-        },
-    })
-}
-
-export function useUpdateFanCafeUrl() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: ({ channelId, body }: { channelId: string; body: UpdateFanCafeUrlRequest }) =>
-            adminApiPatch<void>(`/api/admin/streamers/${channelId}/fan-cafe-url`, body),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
-        },
-    })
-}
-
-export function useUpdateStreamerAffiliations() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: ({ id, body }: { id: number; body: UpdateStreamerAffiliationsRequest }) =>
-            adminApiPut<UpdateStreamerAffiliationsResponse>(`/api/admin/streamers/${id}/affiliations`, body),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
-        },
-    })
-}
-
 export function useDeleteStreamer() {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: (id: number) => adminApiDelete(`/api/admin/streamers/${id}`),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
+        },
+    })
+}
+
+export function useUpdateStreamer() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ id, body }: { id: number; body: UpdateStreamerRequest }) =>
+            adminApiPatch<{ success: boolean }>(`/api/admin/streamers/${id}`, body),
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: STREAMERS_QUERY_KEY })
         },

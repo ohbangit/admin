@@ -1,6 +1,8 @@
 export interface StreamerAffiliation {
     id: number
     name: string
+    type: 'mcn' | 'agency' | 'crew' | 'esports'
+    thumbnailUrl: string | null
 }
 
 export interface StreamerItem {
@@ -9,6 +11,8 @@ export interface StreamerItem {
     nickname: string | null
     channelId: string | null
     isPartner: boolean
+    streamerType: 'cam' | 'vtuber' | 'hybrid'
+    isProGamer: boolean
     channelImageUrl?: string
     followerCount: number | null
     youtubeUrl?: string
@@ -45,27 +49,11 @@ export interface RegisterStreamerResponse {
     isPartner: boolean
 }
 
-export interface UpdateNicknameRequest {
-    nickname: string
-}
-
-export interface UpdateNicknameResponse {
-    id: number
-    nickname: string
-}
-
-export interface UpdateYoutubeUrlRequest {
-    youtubeUrl: string
-}
-
-export interface UpdateFanCafeUrlRequest {
-    fanCafeUrl: string
-}
-
-export interface UpdateStreamerAffiliationsRequest {
-    affiliationIds: number[]
-}
-
-export interface UpdateStreamerAffiliationsResponse {
-    affiliations: StreamerAffiliation[]
+export interface UpdateStreamerRequest {
+    nickname?: string
+    youtubeUrl?: string | null
+    fanCafeUrl?: string | null
+    affiliationIds?: number[]
+    streamerType?: 'cam' | 'vtuber' | 'hybrid'
+    isProGamer?: boolean
 }

@@ -60,12 +60,7 @@ export type {
     StreamerListParams,
     RegisterStreamerRequest,
     RegisterStreamerResponse,
-    UpdateNicknameRequest,
-    UpdateNicknameResponse,
-    UpdateYoutubeUrlRequest,
-    UpdateFanCafeUrlRequest,
-    UpdateStreamerAffiliationsRequest,
-    UpdateStreamerAffiliationsResponse,
+    UpdateStreamerRequest,
 } from './streamer'
 
 export type { NoticeItem, ListNoticesResponse, CreateNoticeRequest, UpdateNoticeRequest } from './notice'

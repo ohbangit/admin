@@ -2,10 +2,23 @@ import { useEffect, useMemo, useState } from 'react'
 import { Check, Tag } from 'lucide-react'
 import { cn } from '../../lib/cn'
 
+const TYPE_LABELS: Record<'mcn' | 'agency' | 'crew' | 'esports', string> = {
+    mcn: 'MCN',
+    agency: '소속사',
+    crew: '크루',
+    esports: '프로게임단',
+}
+
+interface AffiliationEntry {
+    id: number
+    name: string
+    type: 'mcn' | 'agency' | 'crew' | 'esports'
+}
+
 interface AffiliationSectionProps {
     streamerId: number
-    currentAffiliations: { id: number; name: string }[]
-    allAffiliations: { id: number; name: string }[]
+    currentAffiliations: AffiliationEntry[]
+    allAffiliations: AffiliationEntry[]
     pending: boolean
     onSave: (id: number, affiliationIds: number[]) => Promise<void>
 }
@@ -58,6 +71,7 @@ export function AffiliationSection({ streamerId, currentAffiliations, allAffilia
                                         : 'border-[#3a3a44] bg-[#26262e] text-[#adadb8] hover:bg-[#32323d]',
                                 )}
                             >
+                                <span className="mr-1 opacity-60">[{TYPE_LABELS[aff.type]}]</span>
                                 {aff.name}
                             </button>
                         )

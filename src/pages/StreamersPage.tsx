@@ -7,12 +7,9 @@ import {
     useRefreshStreamer,
     useRegisterStreamer,
     useStreamers,
-    useUpdateFanCafeUrl,
-    useUpdateNickname,
-    useUpdateStreamerAffiliations,
-    useUpdateYoutubeUrl,
+    useUpdateStreamer,
 } from '../hooks'
-import type { StreamerItem, StreamerSortType } from '../types'
+import type { StreamerItem, StreamerSortType, UpdateStreamerRequest } from '../types'
 import { cn } from '../lib/cn'
 import partnerMark from '../assets/mark.png'
 import { getErrorMessage } from '../utils/error'
@@ -35,10 +32,7 @@ export default function StreamersPage() {
     const { data: allAffiliations = [] } = useAffiliations()
     const registerMutation = useRegisterStreamer()
     const refreshMutation = useRefreshStreamer()
-    const updateNicknameMutation = useUpdateNickname()
-    const updateYoutubeMutation = useUpdateYoutubeUrl()
-    const updateFanCafeMutation = useUpdateFanCafeUrl()
-    const updateAffiliationsMutation = useUpdateStreamerAffiliations()
+    const updateStreamer = useUpdateStreamer()
     const deleteMutation = useDeleteStreamer()
 
     const [searchInput, setSearchInput] = useState('')
@@ -78,6 +72,13 @@ export default function StreamersPage() {
 
     const { data, isLoading, isError, refetch } = useStreamers(params)
     const items = data?.items ?? []
+
+    useEffect(() => {
+        if (detailStreamer === null) return
+        const updated = items.find((s) => s.id === detailStreamer.id)
+        if (updated) setDetailStreamer(updated)
+    }, [items])
+
     const total = data?.total ?? 0
     const currentPage = data?.page ?? page
     const currentSize = data?.size ?? pageSize
@@ -118,44 +119,18 @@ export default function StreamersPage() {
         }
     }
 
-    async function handleSaveNickname(id: number, nickname: string): Promise<void> {
-        try {
-            await updateNicknameMutation.mutateAsync({ id, body: { nickname } })
-            addToast({ message: '닉네임을 저장했습니다.', variant: 'success' })
-        } catch (error) {
-            const message = getErrorMessage(error)
-            if (message !== null) addToast({ message, variant: 'error' })
-        }
-    }
-
-    async function handleSaveYoutubeUrl(channelId: string, youtubeUrl: string): Promise<void> {
-        try {
-            await updateYoutubeMutation.mutateAsync({ channelId, body: { youtubeUrl } })
-            addToast({ message: 'YouTube URL을 저장했습니다.', variant: 'success' })
-        } catch (error) {
-            const message = getErrorMessage(error)
-            if (message !== null) addToast({ message, variant: 'error' })
-        }
-    }
-
-    async function handleSaveFanCafeUrl(channelId: string, fanCafeUrl: string): Promise<void> {
-        try {
-            await updateFanCafeMutation.mutateAsync({ channelId, body: { fanCafeUrl } })
-            addToast({ message: '팬카페 URL을 저장했습니다.', variant: 'success' })
-        } catch (error) {
-            const message = getErrorMessage(error)
-            if (message !== null) addToast({ message, variant: 'error' })
-        }
-    }
-
-    async function handleSaveAffiliations(id: number, affiliationIds: number[]): Promise<void> {
-        try {
-            await updateAffiliationsMutation.mutateAsync({ id, body: { affiliationIds } })
-            addToast({ message: '소속을 저장했습니다.', variant: 'success' })
-        } catch (error) {
-            const message = getErrorMessage(error)
-            if (message !== null) addToast({ message, variant: 'error' })
-        }
+    function handleSave(data: UpdateStreamerRequest): void {
+        if (!detailStreamer) return
+        updateStreamer.mutate(
+            { id: detailStreamer.id, body: data },
+            {
+                onSuccess: () => addToast({ message: '저장되었습니다.', variant: 'success' }),
+                onError: (error) => {
+                    const message = getErrorMessage(error)
+                    if (message !== null) addToast({ message, variant: 'error' })
+                },
+            },
+        )
     }
 
     async function handleDelete(): Promise<void> {
@@ -279,6 +254,15 @@ export default function StreamersPage() {
                                             <p className="truncate text-sm font-semibold text-[#efeff1]">{streamer.name}</p>
                                             {streamer.isPartner && (
                                                 <img src={partnerMark} alt="파트너" className="h-4 w-4 shrink-0" />
+                                            )}
+                                            {streamer.streamerType === 'vtuber' && (
+                                                <span className="rounded-full bg-purple-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-purple-300">버튜버</span>
+                                            )}
+                                            {streamer.streamerType === 'hybrid' && (
+                                                <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-blue-300">하이브리드</span>
+                                            )}
+                                            {streamer.isProGamer && (
+                                                <span className="rounded-full bg-green-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-green-300">프로</span>
                                             )}
                                         </div>
                                         {showNickname && <p className="mt-0.5 truncate text-xs text-[#adadb8]">{streamer.nickname}</p>}
@@ -418,16 +402,10 @@ export default function StreamersPage() {
                 <StreamerDetailModal
                     streamer={detailStreamer}
                     allAffiliations={allAffiliations}
-                    pendingNickname={updateNicknameMutation.isPending}
-                    pendingYoutube={updateYoutubeMutation.isPending}
-                    pendingFanCafe={updateFanCafeMutation.isPending}
-                    pendingAffiliations={updateAffiliationsMutation.isPending}
+                    pendingSave={updateStreamer.isPending}
                     pendingDelete={deleteMutation.isPending}
                     onClose={() => setDetailStreamer(null)}
-                    onSaveNickname={handleSaveNickname}
-                    onSaveYoutubeUrl={handleSaveYoutubeUrl}
-                    onSaveFanCafeUrl={handleSaveFanCafeUrl}
-                    onSaveAffiliations={handleSaveAffiliations}
+                    onSave={handleSave}
                     onDelete={() => setDeletingStreamer(detailStreamer)}
                 />
             )}

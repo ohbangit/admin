@@ -9,9 +9,18 @@ import { ConfirmModal } from '../components/ConfirmModal'
 import { ListLoading, ListError, ListEmpty } from '../components/ListState'
 import { ModalOverlay } from '../components/ModalOverlay'
 
+const TYPE_LABELS: Record<'mcn' | 'agency' | 'crew' | 'esports', string> = {
+    mcn: 'MCN',
+    agency: '소속사',
+    crew: '크루',
+    esports: '프로게임단',
+}
+
 interface AffiliationFormValues {
     name: string
     color: string
+    type: 'mcn' | 'agency' | 'crew' | 'esports'
+    thumbnailUrl: string
 }
 
 const COLOR_PRESETS = [
@@ -24,6 +33,8 @@ function toFormValues(item?: AffiliationItem): AffiliationFormValues {
     return {
         name: item?.name ?? '',
         color: item?.color ?? '',
+        type: item?.type ?? 'crew',
+        thumbnailUrl: item?.thumbnailUrl ?? '',
     }
 }
 
@@ -40,6 +51,8 @@ function buildCreatePayload(values: AffiliationFormValues): CreateAffiliationReq
     return {
         name: values.name.trim(),
         color: color.length > 0 ? color : null,
+        type: values.type,
+        thumbnail_url: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
     }
 }
 
@@ -48,6 +61,8 @@ function buildUpdatePayload(values: AffiliationFormValues): UpdateAffiliationReq
     return {
         name: values.name.trim(),
         color: color.length > 0 ? color : null,
+        type: values.type,
+        thumbnail_url: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
     }
 }
 
@@ -83,6 +98,8 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
         await onSubmit({
             name: trimmedName,
             color: normalized,
+            type: values.type,
+            thumbnailUrl: values.thumbnailUrl,
         })
     }
 
@@ -90,7 +107,7 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
         <ModalOverlay size="lg" disabled={pending} onClose={onClose}>
                 <div className="border-b border-[#3a3a44] px-6 py-4">
                     <h2 className="text-base font-bold text-[#efeff1]">{title}</h2>
-                    <p className="mt-1 text-xs text-[#adadb8]">소속명과 색상을 설정할 수 있습니다.</p>
+                    <p className="mt-1 text-xs text-[#adadb8]">소속명, 타입, 색상을 설정할 수 있습니다.</p>
                 </div>
 
                 <div className="space-y-3 px-6 py-4">
@@ -106,6 +123,30 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
                             placeholder="예: 팀 오로라"
                             autoFocus
                         />
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-medium text-[#adadb8]">
+                            타입 <span className="text-red-400">*</span>
+                        </label>
+                        <div className="flex gap-1.5">
+                            {(['mcn', 'agency', 'crew', 'esports'] as const).map((t) => (
+                                <button
+                                    key={t}
+                                    type="button"
+                                    onClick={() => setValues((prev) => ({ ...prev, type: t }))}
+                                    disabled={pending}
+                                    className={cn(
+                                        'cursor-pointer flex-1 rounded-xl border py-2 text-xs font-semibold transition disabled:opacity-50',
+                                        values.type === t
+                                            ? 'border-blue-500/40 bg-blue-500/15 text-blue-300'
+                                            : 'border-[#3a3a44] bg-[#26262e] text-[#adadb8] hover:bg-[#32323d]',
+                                    )}
+                                >
+                                    {TYPE_LABELS[t]}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="space-y-2">
@@ -154,6 +195,17 @@ function AffiliationFormModal({ title, submitLabel, initialValues, pending, onCl
                                 />
                             ))}
                         </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-medium text-[#adadb8]">로고 이미지 URL</label>
+                        <input
+                            type="text"
+                            value={values.thumbnailUrl}
+                            onChange={(event) => setValues((prev) => ({ ...prev, thumbnailUrl: event.target.value }))}
+                            className={inputClass}
+                            placeholder="로고 이미지 URL"
+                        />
                     </div>
 
                     {error !== null && <p className="text-xs text-red-400">{error}</p>}
@@ -249,8 +301,9 @@ export default function AffiliationManagePage() {
             </div>
 
             <div className={panelClass}>
-                <div className="grid grid-cols-[96px_minmax(0,1fr)_132px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
+                <div className="grid grid-cols-[96px_72px_minmax(0,1fr)_132px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
                     <div>색상</div>
+                    <div>타입</div>
                     <div className="text-left">소속명</div>
                     <div>작업</div>
                 </div>
@@ -264,7 +317,7 @@ export default function AffiliationManagePage() {
                 {!isLoading && !isError && affiliations.length > 0 && (
                     <ul className="divide-y divide-[#3a3a44]">
                         {affiliations.map((item) => (
-                            <li key={item.id} className="grid grid-cols-[96px_minmax(0,1fr)_132px] items-center gap-3 px-4 py-3">
+                            <li key={item.id} className="grid grid-cols-[96px_72px_minmax(0,1fr)_132px] items-center gap-3 px-4 py-3">
                                 <div className="flex justify-center">
                                     <span
                                         className={cn(
@@ -273,6 +326,12 @@ export default function AffiliationManagePage() {
                                         )}
                                         style={item.color === null ? undefined : { backgroundColor: item.color }}
                                     />
+                                </div>
+
+                                <div className="flex justify-center">
+                                    <span className="rounded-full border border-[#3a3a44] bg-[#26262e] px-2 py-0.5 text-xs text-[#adadb8]">
+                                        {TYPE_LABELS[item.type]}
+                                    </span>
                                 </div>
 
                                 <div className="truncate text-sm text-[#efeff1]">{item.name}</div>
