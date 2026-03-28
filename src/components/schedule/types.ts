@@ -18,11 +18,8 @@ export interface BroadcastFormValues {
     isDrops: boolean
     isChzzkSupport: boolean
     participants: ParticipantDraft[]
-}
-
-export interface BroadcastSourceInfo {
-    sourceUrl?: string | null
-    sourceImageUrl?: string | null
+    sourceUrl: string
+    sourceImageUrl: string
 }
 
 export interface BroadcastFormModalProps {
@@ -32,7 +29,6 @@ export interface BroadcastFormModalProps {
     pending: boolean
     categories: { id: number; name: string }[]
     streamers: StreamerItem[]
-    sourceInfo?: BroadcastSourceInfo
     onClose: () => void
     onSubmit: (values: BroadcastFormValues) => Promise<void>
 }

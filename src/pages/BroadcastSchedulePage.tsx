@@ -253,17 +253,6 @@ export default function BroadcastSchedulePage() {
                     pending={isFormPending}
                     categories={categoryOptions}
                     streamers={streamers}
-                    sourceInfo={
-                        editingItem.sourceUrl || editingItem.sourceImageUrl
-                            ? {
-                                  sourceUrl: editingItem.sourceUrl,
-                                  sourceImageUrl:
-                                      'extraction' in editingItem
-                                          ? (editingItem.extraction?.sourceImageUrl ?? editingItem.sourceImageUrl)
-                                          : editingItem.sourceImageUrl,
-                              }
-                            : undefined
-                    }
                     onClose={() => setEditingItem(null)}
                     onSubmit={handleUpdate}
                 />

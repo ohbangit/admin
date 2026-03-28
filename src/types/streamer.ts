@@ -32,7 +32,6 @@ export type StreamerSortType = 'name_asc' | 'name_desc' | 'follower_desc'
 
 export interface StreamerListParams {
     name?: string
-    hasChannel?: boolean
     page?: number
     size?: number
     sort?: StreamerSortType

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { Clock, ExternalLink, Gift, ImageIcon, MessageSquare, Tag, Type, X, Zap } from 'lucide-react'
+import { Clock, ExternalLink, Gift, ImageIcon, Link, Tag, Type, X, Zap } from 'lucide-react'
 import type { BroadcastFormModalProps, BroadcastFormValues } from './types'
 import { BROADCAST_TYPE_PRESETS, HOUR_OPTIONS, MINUTE_OPTIONS, getBroadcastTypeBadgeClass, parseTags } from './utils'
 import { cn } from '../../lib/cn'
@@ -9,7 +9,7 @@ import { ModalOverlay } from '../ModalOverlay'
 import { CategorySelector } from './CategorySelector'
 import { ParticipantManager } from './ParticipantManager'
 
-export function BroadcastFormModal({ title, submitLabel, initialValues, pending, categories, streamers, sourceInfo, onClose, onSubmit }: BroadcastFormModalProps) {
+export function BroadcastFormModal({ title, submitLabel, initialValues, pending, categories, streamers, onClose, onSubmit }: BroadcastFormModalProps) {
     const [values, setValues] = useState<BroadcastFormValues>(initialValues)
     const [error, setError] = useState<string | null>(null)
 
@@ -97,25 +97,26 @@ export function BroadcastFormModal({ title, submitLabel, initialValues, pending,
             </div>
 
             <div className="max-h-[68vh] space-y-4 overflow-auto px-6 py-4">
-                {(sourceInfo?.sourceImageUrl || sourceInfo?.sourceUrl) && (
-                    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#3a3a44] bg-[#1f1f28] px-3.5 py-2.5">
-                        <span className="text-xs font-medium text-[#848494]">출처</span>
-                        {sourceInfo.sourceImageUrl && (
-                            <a href={sourceInfo.sourceImageUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-[#3a3a44] px-2 py-1 text-xs text-[#adadb8] transition hover:border-blue-500/40 hover:text-blue-300">
-                                <ImageIcon className="h-3 w-3 shrink-0" />
-                                <span className="max-w-[200px] truncate">{sourceInfo.sourceImageUrl}</span>
-                                <ExternalLink className="h-2.5 w-2.5 shrink-0 opacity-50" />
-                            </a>
-                        )}
-                        {sourceInfo.sourceUrl && (
-                            <a href={sourceInfo.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-[#3a3a44] px-2 py-1 text-xs text-[#adadb8] transition hover:border-blue-500/40 hover:text-blue-300">
-                                <MessageSquare className="h-3 w-3" />
-                                커뮤니티
-                                <ExternalLink className="h-2.5 w-2.5 opacity-50" />
-                            </a>
-                        )}
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                        <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">
+                            <ImageIcon className="h-3.5 w-3.5" /> 출처 이미지
+                            {values.sourceImageUrl.trim().length > 0 && (
+                                <a href={values.sourceImageUrl} target="_blank" rel="noopener noreferrer" className="text-[#848494] hover:text-blue-300"><ExternalLink className="h-3 w-3" /></a>
+                            )}
+                        </label>
+                        <input type="text" value={values.sourceImageUrl} onChange={(event) => setValues((prev) => ({ ...prev, sourceImageUrl: event.target.value }))} className={inputClass} placeholder="URL" />
                     </div>
-                )}
+                    <div className="space-y-1">
+                        <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">
+                            <Link className="h-3.5 w-3.5" /> 출처 링크
+                            {values.sourceUrl.trim().length > 0 && (
+                                <a href={values.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#848494] hover:text-blue-300"><ExternalLink className="h-3 w-3" /></a>
+                            )}
+                        </label>
+                        <input type="text" value={values.sourceUrl} onChange={(event) => setValues((prev) => ({ ...prev, sourceUrl: event.target.value }))} className={inputClass} placeholder="URL" />
+                    </div>
+                </div>
 
                 <div className="space-y-1">
                     <label className="flex items-center gap-1.5 text-xs font-medium text-[#adadb8]">

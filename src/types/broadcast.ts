@@ -93,6 +93,8 @@ export interface CreateBroadcastRequest {
     sourceVersion?: string
     participants?: BroadcastParticipantInput[]
     participantIds?: number[]
+    sourceUrl?: string
+    sourceImageUrl?: string
 }
 
 /** 방송 수정 요청 */
@@ -111,6 +113,8 @@ export interface UpdateBroadcastRequest {
     sourceVersion?: string
     participants?: BroadcastParticipantInput[]
     participantIds?: number[]
+    sourceUrl?: string
+    sourceImageUrl?: string
 }
 
 /** 참여자 입력 (생성/수정 시) */

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import type { BroadcastItem, BroadcastParticipantInput, CreateBroadcastRequest, UpdateBroadcastRequest } from '../../types'
+import type { BroadcastItem, BroadcastParticipantInput, CreateBroadcastRequest, ReviewBroadcastItem, UpdateBroadcastRequest } from '../../types'
 import type { BroadcastFormValues } from './types'
 
 export const KOREAN_DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
@@ -74,6 +74,8 @@ export function toCreatePayload(values: BroadcastFormValues): CreateBroadcastReq
         isDrops: values.isDrops,
         isChzzkSupport: values.isChzzkSupport,
         participants,
+        sourceUrl: values.sourceUrl.trim() || undefined,
+        sourceImageUrl: values.sourceImageUrl.trim() || undefined,
     }
 }
 
@@ -95,10 +97,12 @@ export function toUpdatePayload(values: BroadcastFormValues): UpdateBroadcastReq
         isDrops: values.isDrops,
         isChzzkSupport: values.isChzzkSupport,
         participants,
+        sourceUrl: values.sourceUrl.trim() || undefined,
+        sourceImageUrl: values.sourceImageUrl.trim() || undefined,
     }
 }
 
-export function toFormValues(item: BroadcastItem | null, selectedDate: dayjs.Dayjs): BroadcastFormValues {
+export function toFormValues(item: BroadcastItem | (BroadcastItem & { extraction?: ReviewBroadcastItem['extraction'] }) | null, selectedDate: dayjs.Dayjs): BroadcastFormValues {
     if (item === null) {
         const initialStart = getInitialStartTime(selectedDate)
         return {
@@ -113,6 +117,8 @@ export function toFormValues(item: BroadcastItem | null, selectedDate: dayjs.Day
             isDrops: false,
             isChzzkSupport: false,
             participants: [],
+            sourceUrl: '',
+            sourceImageUrl: '',
         }
     }
 
@@ -136,5 +142,7 @@ export function toFormValues(item: BroadcastItem | null, selectedDate: dayjs.Day
             streamerId: streamer.streamerId ?? undefined,
             isHost: streamer.isHost,
         })),
+        sourceUrl: item.sourceUrl ?? '',
+        sourceImageUrl: ('extraction' in item && item.extraction?.sourceImageUrl) ? item.extraction.sourceImageUrl : (item.sourceImageUrl ?? ''),
     }
 }

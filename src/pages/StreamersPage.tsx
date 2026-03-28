@@ -37,7 +37,6 @@ export default function StreamersPage() {
 
     const [searchInput, setSearchInput] = useState('')
     const [debouncedName, setDebouncedName] = useState('')
-    const [tab, setTab] = useState<'all' | 'no_channel'>('all')
     const [sort, setSort] = useState<StreamerSortType>('name_asc')
     const [page, setPage] = useState(1)
 
@@ -57,17 +56,16 @@ export default function StreamersPage() {
 
     useEffect(() => {
         setPage(1)
-    }, [debouncedName, tab, sort])
+    }, [debouncedName, sort])
 
     const params = useMemo(
         () => ({
             name: debouncedName.length > 0 ? debouncedName : undefined,
-            hasChannel: tab === 'no_channel' ? false : undefined,
             page,
             size: pageSize,
             sort,
         }),
-        [debouncedName, tab, page, sort],
+        [debouncedName, page, sort],
     )
 
     const { data, isLoading, isError, refetch } = useStreamers(params)
@@ -172,7 +170,7 @@ export default function StreamersPage() {
             </div>
 
             <div className={cn(panelClass, 'mb-4 p-4')}>
-                <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
+                <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                     <div className="relative">
                         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#848494]" />
                         <input
@@ -182,29 +180,6 @@ export default function StreamersPage() {
                             className={cn('w-full rounded-xl border border-[#3a3a44] bg-[#26262e] px-3 py-2 text-sm text-[#efeff1] outline-none transition placeholder:text-[#848494] focus:border-blue-500 pl-9')}
                             placeholder="이름 검색"
                         />
-                    </div>
-
-                    <div className="inline-flex w-full rounded-xl border border-[#3a3a44] bg-[#26262e] p-1 md:w-auto">
-                        <button
-                            type="button"
-                            onClick={() => setTab('all')}
-                            className={cn(
-                                'cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition',
-                                tab === 'all' ? 'bg-blue-600 text-white' : 'text-[#adadb8] hover:text-[#efeff1]',
-                            )}
-                        >
-                            전체
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setTab('no_channel')}
-                            className={cn(
-                                'cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition',
-                                tab === 'no_channel' ? 'bg-blue-600 text-white' : 'text-[#adadb8] hover:text-[#efeff1]',
-                            )}
-                        >
-                            채널 미등록
-                        </button>
                     </div>
 
                     <select value={sort} onChange={(event) => setSort(event.target.value as StreamerSortType)} className={cn(selectClass, 'md:w-40')}>

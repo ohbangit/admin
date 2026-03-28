@@ -13,7 +13,6 @@ const STREAMERS_QUERY_KEY = ['admin-streamers'] as const
 function buildQueryParams(params: StreamerListParams): Record<string, string> {
     const result: Record<string, string> = {}
     if (params.name) result.name = params.name
-    if (params.hasChannel !== undefined) result.hasChannel = String(params.hasChannel)
     if (params.page) result.page = String(params.page)
     if (params.size) result.size = String(params.size)
     if (params.sort) result.sort = params.sort
