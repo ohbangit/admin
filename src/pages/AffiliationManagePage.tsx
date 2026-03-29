@@ -52,7 +52,7 @@ function buildCreatePayload(values: AffiliationFormValues): CreateAffiliationReq
         name: values.name.trim(),
         color: color.length > 0 ? color : null,
         type: values.type,
-        thumbnail_url: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
+        thumbnailUrl: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
     }
 }
 
@@ -62,7 +62,7 @@ function buildUpdatePayload(values: AffiliationFormValues): UpdateAffiliationReq
         name: values.name.trim(),
         color: color.length > 0 ? color : null,
         type: values.type,
-        thumbnail_url: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
+        thumbnailUrl: values.thumbnailUrl.trim().length > 0 ? values.thumbnailUrl.trim() : null,
     }
 }
 

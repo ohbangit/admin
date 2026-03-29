@@ -14,12 +14,12 @@ export interface CreateAffiliationRequest {
     name: string
     color?: string | null
     type: 'mcn' | 'agency' | 'crew' | 'esports'
-    thumbnail_url?: string | null
+    thumbnailUrl?: string | null
 }
 
 export interface UpdateAffiliationRequest {
     name: string
     color?: string | null
     type: 'mcn' | 'agency' | 'crew' | 'esports'
-    thumbnail_url?: string | null
+    thumbnailUrl?: string | null
 }
