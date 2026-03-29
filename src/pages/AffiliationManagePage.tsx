@@ -301,7 +301,7 @@ export default function AffiliationManagePage() {
             </div>
 
             <div className={panelClass}>
-                <div className="grid grid-cols-[96px_72px_minmax(0,1fr)_132px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
+                <div className="grid grid-cols-[56px_120px_minmax(0,1fr)_88px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
                     <div>색상</div>
                     <div>타입</div>
                     <div className="text-left">소속명</div>
@@ -317,7 +317,7 @@ export default function AffiliationManagePage() {
                 {!isLoading && !isError && affiliations.length > 0 && (
                     <ul className="divide-y divide-[#3a3a44]">
                         {affiliations.map((item) => (
-                            <li key={item.id} className="grid grid-cols-[96px_72px_minmax(0,1fr)_132px] items-center gap-3 px-4 py-3">
+                            <li key={item.id} className="grid grid-cols-[56px_120px_minmax(0,1fr)_88px] items-center gap-3 px-4 py-3">
                                 <div className="flex justify-center">
                                     <span
                                         className={cn(
