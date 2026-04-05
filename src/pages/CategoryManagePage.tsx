@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Check, Download, FolderOpen, Plus, Search, Trash2, X } from 'lucide-react'
+import { Check, Download, FolderOpen, ImageIcon, Pencil, Plus, Search, Trash2, X } from 'lucide-react'
 import {
     useAdminToast,
     useCategories,
@@ -7,6 +7,7 @@ import {
     useDeleteCategory,
     useInsertCrawledCategories,
     useRunCategoryCrawl,
+    useUpdateCategory,
 } from '../hooks'
 import type { CategoryItem, CrawledCategory } from '../types'
 import { cn } from '../lib/cn'
@@ -92,6 +93,87 @@ function CreateCategoryModal({ pending, onClose, onSubmit }: CreateCategoryModal
                         {pending ? '추가 중...' : '추가'}
                     </button>
                 </div>
+        </ModalOverlay>
+    )
+}
+
+interface EditCategoryModalProps {
+    category: CategoryItem
+    pending: boolean
+    onClose: () => void
+    onSubmit: (values: { backgroundImageUrl: string | null }) => Promise<void>
+}
+
+function EditCategoryModal({ category, pending, onClose, onSubmit }: EditCategoryModalProps) {
+    const [backgroundImageUrl, setBackgroundImageUrl] = useState(category.backgroundImageUrl ?? '')
+
+    async function handleSubmit(): Promise<void> {
+        const normalized = backgroundImageUrl.trim()
+        await onSubmit({
+            backgroundImageUrl: normalized.length > 0 ? normalized : null,
+        })
+    }
+
+    return (
+        <ModalOverlay size="lg" disabled={pending} onClose={onClose}>
+            <div className="border-b border-[#3a3a44] px-6 py-4">
+                <h2 className="text-base font-bold text-[#efeff1]">카테고리 배경 이미지 수정</h2>
+                <p className="mt-1 text-xs text-[#adadb8]">{category.name}</p>
+            </div>
+
+            <div className="space-y-4 px-6 py-4">
+                {category.backgroundImageUrl !== null && (
+                    <div className="space-y-1">
+                        <p className="text-xs font-medium text-[#adadb8]">현재 배경 이미지</p>
+                        <img
+                            src={category.backgroundImageUrl}
+                            alt={`${category.name} 배경 이미지`}
+                            className="aspect-video w-full rounded-xl object-cover"
+                        />
+                    </div>
+                )}
+
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-[#adadb8]">배경 이미지 URL</label>
+                    <input
+                        type="url"
+                        value={backgroundImageUrl}
+                        onChange={(e) => setBackgroundImageUrl(e.target.value)}
+                        className={inputClass}
+                        placeholder="https://..."
+                    />
+                </div>
+
+                <button
+                    type="button"
+                    onClick={() => setBackgroundImageUrl('')}
+                    disabled={pending}
+                    className="cursor-pointer inline-flex items-center justify-center rounded-lg border border-[#3a3a44] px-3 py-2 text-xs font-medium text-[#adadb8] transition hover:bg-[#26262e] disabled:opacity-50"
+                >
+                    URL 비우기
+                </button>
+            </div>
+
+            <div className="flex gap-2 border-t border-[#3a3a44] px-6 py-4">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={pending}
+                    className="cursor-pointer flex-1 rounded-xl border border-[#3a3a44] py-2.5 text-sm font-medium text-[#adadb8] transition hover:bg-[#26262e] disabled:opacity-50"
+                >
+                    취소
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                        void handleSubmit()
+                    }}
+                    disabled={pending}
+                    className="cursor-pointer flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                >
+                    {pending ? '저장 중...' : '저장'}
+                </button>
+            </div>
         </ModalOverlay>
     )
 }
@@ -293,12 +375,14 @@ export default function CategoryManagePage() {
     const { data: categories = [], isLoading, isError, refetch } = useCategories()
     const createMutation = useCreateCategory()
     const deleteMutation = useDeleteCategory()
+    const updateMutation = useUpdateCategory()
     const runCrawlMutation = useRunCategoryCrawl()
     const insertCrawledMutation = useInsertCrawledCategories()
 
     const [search, setSearch] = useState('')
     const [creating, setCreating] = useState(false)
     const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null)
+    const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null)
     const [crawling, setCrawling] = useState(false)
 
     const normalizedSearch = search.trim().toLowerCase()
@@ -331,6 +415,21 @@ export default function CategoryManagePage() {
             await deleteMutation.mutateAsync(deletingCategory.id)
             addToast({ message: '카테고리가 삭제되었습니다.', variant: 'success' })
             setDeletingCategory(null)
+        } catch (error) {
+            const message = getErrorMessage(error)
+            if (message !== null) addToast({ message, variant: 'error' })
+        }
+    }
+
+    async function handleUpdate(values: { backgroundImageUrl: string | null }): Promise<void> {
+        if (editingCategory === null) return
+        try {
+            await updateMutation.mutateAsync({
+                id: editingCategory.id,
+                body: { backgroundImageUrl: values.backgroundImageUrl },
+            })
+            addToast({ message: '배경 이미지가 수정되었습니다.', variant: 'success' })
+            setEditingCategory(null)
         } catch (error) {
             const message = getErrorMessage(error)
             if (message !== null) addToast({ message, variant: 'error' })
@@ -401,8 +500,9 @@ export default function CategoryManagePage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-[88px_minmax(0,1fr)_96px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
+                <div className="grid grid-cols-[88px_120px_minmax(0,1fr)_140px] items-center gap-3 border-b border-[#3a3a44] px-4 py-3 text-center text-xs font-semibold text-[#848494]">
                     <div>썸네일</div>
+                    <div>배경</div>
                     <div>카테고리명</div>
                     <div>작업</div>
                 </div>
@@ -416,7 +516,7 @@ export default function CategoryManagePage() {
                 {!isLoading && !isError && filteredCategories.length > 0 && (
                     <ul className="divide-y divide-[#3a3a44]">
                         {filteredCategories.map((category) => (
-                            <li key={category.id} className="grid grid-cols-[88px_minmax(0,1fr)_96px] items-center gap-3 px-4 py-3">
+                            <li key={category.id} className="grid grid-cols-[88px_120px_minmax(0,1fr)_140px] items-center gap-3 px-4 py-3">
                                 <div className="flex justify-center">
                                     {category.thumbnailUrl !== null ? (
                                         <img
@@ -431,9 +531,31 @@ export default function CategoryManagePage() {
                                     )}
                                 </div>
 
+                                <div className="flex justify-center">
+                                    {category.backgroundImageUrl !== null ? (
+                                        <img
+                                            src={category.backgroundImageUrl}
+                                            alt={`${category.name} 배경 이미지`}
+                                            className="aspect-video w-24 rounded-lg object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex aspect-video w-24 items-center justify-center rounded-lg border border-[#3a3a44] bg-[#26262e] text-[#848494]">
+                                            <ImageIcon className="h-4 w-4" />
+                                        </div>
+                                    )}
+                                </div>
+
                                 <p className="truncate text-sm text-[#efeff1]">{category.name}</p>
 
-                                <div className="flex justify-center">
+                                <div className="flex justify-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingCategory(category)}
+                                        className="cursor-pointer inline-flex items-center justify-center rounded-lg border border-[#3a3a44] p-2 text-[#adadb8] transition hover:bg-[#26262e]"
+                                        aria-label={`${category.name} 배경 이미지 수정`}
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </button>
                                     <button
                                         type="button"
                                         onClick={() => setDeletingCategory(category)}
@@ -454,6 +576,15 @@ export default function CategoryManagePage() {
                     pending={createMutation.isPending}
                     onClose={() => setCreating(false)}
                     onSubmit={handleCreate}
+                />
+            )}
+
+            {editingCategory !== null && (
+                <EditCategoryModal
+                    category={editingCategory}
+                    pending={updateMutation.isPending}
+                    onClose={() => setEditingCategory(null)}
+                    onSubmit={handleUpdate}
                 />
             )}
 

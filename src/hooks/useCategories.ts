@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { adminApiDelete, adminApiGet, adminApiPost } from '../lib/apiClient'
+import { adminApiDelete, adminApiGet, adminApiPatch, adminApiPost } from '../lib/apiClient'
 import type {
     CategoryItem,
     InsertCrawledCategoriesRequest,
     InsertCrawledCategoriesResponse,
     ListCategoriesResponse,
     CreateCategoryRequest,
+    UpdateCategoryRequest,
     RunCategoryCrawlRequest,
     RunCategoryCrawlResponse,
 } from '../types'
@@ -36,6 +37,17 @@ export function useDeleteCategory() {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: (id: number) => adminApiDelete(`/api/admin/categories/${id}`),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY })
+        },
+    })
+}
+
+export function useUpdateCategory() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ id, body }: { id: number; body: UpdateCategoryRequest }) =>
+            adminApiPatch(`/api/admin/categories/${id}`, body),
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY })
         },

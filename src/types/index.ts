@@ -45,6 +45,7 @@ export type {
     CategoryItem,
     ListCategoriesResponse,
     CreateCategoryRequest,
+    UpdateCategoryRequest,
     CrawledCategory,
     RunCategoryCrawlRequest,
     RunCategoryCrawlResponse,

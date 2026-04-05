@@ -2,6 +2,7 @@ export interface CategoryItem {
     id: number
     name: string
     thumbnailUrl: string | null
+    backgroundImageUrl: string | null
 }
 
 export interface ListCategoriesResponse {
@@ -11,6 +12,10 @@ export interface ListCategoriesResponse {
 export interface CreateCategoryRequest {
     name: string
     thumbnailUrl?: string | null
+}
+
+export interface UpdateCategoryRequest {
+    backgroundImageUrl?: string | null
 }
 
 export interface CrawledCategory {

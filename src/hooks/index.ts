@@ -29,6 +29,13 @@ export {
     useRunBroadcastCrawl,
     useInsertCrawledBroadcasts,
 } from './useBroadcasts'
-export { useCategories, useCreateCategory, useDeleteCategory, useRunCategoryCrawl, useInsertCrawledCategories } from './useCategories'
+export {
+    useCategories,
+    useCreateCategory,
+    useDeleteCategory,
+    useUpdateCategory,
+    useRunCategoryCrawl,
+    useInsertCrawledCategories,
+} from './useCategories'
 export { useStreamers, useRegisterStreamer, useRefreshStreamer, useDeleteStreamer, useUpdateStreamer } from './useStreamers'
 export { useNotices, useCreateNotice, useUpdateNotice, useDeleteNotice } from './useNotices'
