@@ -56,3 +56,21 @@ export interface UpdateStreamerRequest {
     streamerType?: 'cam' | 'vtuber' | 'hybrid'
     isProGamer?: boolean
 }
+
+export interface StreamerAlias {
+    id: number
+    alias: string
+    createdAt: string
+}
+
+export interface ListStreamerAliasesResponse {
+    items: StreamerAlias[]
+}
+
+export interface CreateStreamerAliasResponse {
+    item: StreamerAlias
+}
+
+export interface CreateStreamerAliasRequest {
+    alias: string
+}

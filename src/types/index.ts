@@ -62,6 +62,10 @@ export type {
     RegisterStreamerRequest,
     RegisterStreamerResponse,
     UpdateStreamerRequest,
+    StreamerAlias,
+    ListStreamerAliasesResponse,
+    CreateStreamerAliasResponse,
+    CreateStreamerAliasRequest,
 } from './streamer'
 
 export type { NoticeItem, ListNoticesResponse, CreateNoticeRequest, UpdateNoticeRequest } from './notice'

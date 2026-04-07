@@ -13,6 +13,7 @@ import { inputClass } from '../../constants/styles'
 import { ModalOverlay } from '../ModalOverlay'
 import { Avatar } from './Avatar'
 import { AffiliationSectionDropdown } from './AffiliationSectionDropdown'
+import { AliasSection } from './AliasSection'
 import { ScheduleSourceSection } from './ScheduleSourceSection'
 import { formatFollowerCount, normalizeInput } from '../../utils/format'
 import partnerMark from '../../assets/mark.png'
@@ -45,6 +46,7 @@ export function StreamerDetailModal({
     const [affiliationIds, setAffiliationIds] = useState<number[]>(streamer.affiliations.map((a) => a.id))
     const [isEditingNickname, setIsEditingNickname] = useState(false)
     const [isSourcePending, setIsSourcePending] = useState(false)
+    const [isAliasPending, setIsAliasPending] = useState(false)
 
     useEffect(() => {
         setNickname(streamer.nickname ?? '')
@@ -67,7 +69,7 @@ export function StreamerDetailModal({
         affiliationIds.length !== originalAffIds.length ||
         affiliationIds.some((id) => !originalAffIds.includes(id))
 
-    const isAnyPending = pendingSave || pendingDelete || isSourcePending
+    const isAnyPending = pendingSave || pendingDelete || isSourcePending || isAliasPending
 
     const channelLink = streamer.channelId ? `https://chzzk.naver.com/${streamer.channelId}` : null
     const displayName = nickname.length > 0 && nickname !== streamer.name ? nickname : streamer.name
@@ -279,6 +281,16 @@ export function StreamerDetailModal({
                             allAffiliations={allAffiliations}
                             selectedIds={affiliationIds}
                             onChange={setAffiliationIds}
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-[#848494]">별명</h3>
+                    <div className="rounded-xl border border-[#3a3a44]/50 bg-[#1a1a22] p-4">
+                        <AliasSection
+                            streamerId={streamer.id}
+                            onPendingChange={setIsAliasPending}
                         />
                     </div>
                 </div>
